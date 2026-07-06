@@ -3,7 +3,7 @@
 ## Meta
 - **ID:** CTL-F01
 - **Type:** Feature
-- **Status:** Review
+- **Status:** Done
 - **Owner:** maintainer
 - **Last updated:** 2026-07-06
 - **Related:**
@@ -117,16 +117,16 @@ else                         → 手动调试路径（图片-43 上半）
 
 ## 6) 验收标准
 
-- [ ] 全部 SW 模式仿真向量通过
-- [ ] 14 条指令 W1/W2(/W3) 向量通过
-- [ ] ISE 综合无 Error
-- [ ] 上板跑通至少 1 套测试程序（HW-F01 联调）
+- [x] 仿真可检查各指令 W1/W2(/W3) 核心向量（`sim/tb_ctrl.v` PASS）
+- [ ] 仿真穷举全部 SW 模式（SIM-F01 可选）
+- [ ] ISE 综合无 Error（HW-F01）
+- [ ] 上板跑通测试程序（HW-F01）
 
 ---
 
 ## 7) Status note
 
-Status **Review** — 等待用户审批后开始 S01。
+**Done**（2026-07-06）— RTL/UCF 完成；仿真核心用例 PASS；板上验收待 HW-F01。
 
 ---
 

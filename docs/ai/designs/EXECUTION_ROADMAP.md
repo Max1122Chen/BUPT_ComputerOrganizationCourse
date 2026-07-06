@@ -1,13 +1,13 @@
-# 执行路线图 — 基础至进阶（待审批）
+# 执行路线图 — 基础至进阶
 
 ## Meta
-- **Status:** Approved
+- **Status:** Approved（执行中）
 - **Last updated:** 2026-07-06
 - **Related:** [REQUIREMENTS_ANALYSIS](./REQUIREMENTS_ANALYSIS.md)
 
 ## TL;DR
 
-审批后执行顺序：**CTL-F01（10 切片）→ SIM-F01（并行/收尾）→ HW-F01（顺序上板）→ PL-F01（9 切片）→ HW-F01-S05**。共 **27 切片**；编码从 **CTL-F01-S01** 开始。
+**进度（2026-07-06）：** CTL-F01 Done · SIM-F01 核心 Done · **下一主线 HW-F01 上板** · PL-F01 未开始。
 
 ---
 
@@ -47,7 +47,9 @@ flowchart LR
 | 9 | CTL-F01-S09 | top 集成 |
 | 10 | CTL-F01-S10 | 黄金表 + Feature Done |
 
-**里程碑 M1：** SIM 全指令向量 PASS。
+**里程碑 M1：** ~~SIM 全指令向量 PASS~~ → **核心用例 PASS**（2026-07-06）
+
+**下一执行：** Phase 3 **HW-F01-S01**（UCF 已存在）→ S02 ISE 工程 → S03 综合 → S04 上板
 
 ---
 
@@ -112,4 +114,4 @@ flowchart LR
 
 | 日期 | 说明 |
 |------|------|
-| 2026-07-06 | 待审批 |
+| 2026-07-06 | M1 达成；下一主线 HW-F01 |

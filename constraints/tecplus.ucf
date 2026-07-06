@@ -1,0 +1,45 @@
+# TEC-PLUS hardwired controller — Spartan-6 XC6SLX9 (image-47)
+# Populated in HW-F01-S01; names match rtl/top/top.v
+
+NET "CLR_n" LOC = F6;
+NET "T3"    LOC = C10;
+NET "SWA"   LOC = K11;
+NET "SWB"   LOC = F7;
+NET "SWC"   LOC = J12;
+NET "IR4"   LOC = G12;
+NET "IR5"   LOC = E11;
+NET "IR6"   LOC = J11;
+NET "IR7"   LOC = E12;
+NET "W1"    LOC = F9;
+NET "W2"    LOC = K12;
+NET "W3"    LOC = N5;
+NET "C"     LOC = B5;
+NET "Z"     LOC = A5;
+
+NET "LDZ"    LOC = R16;
+NET "LDC"    LOC = E3;
+NET "CIN"    LOC = R15;
+NET "S0"     LOC = R14;
+NET "S1"     LOC = H11;
+NET "S2"     LOC = T15;
+NET "S3"     LOC = C13;
+NET "M"      LOC = A7;
+NET "ABUS"   LOC = B8;
+NET "DRW"    LOC = A13;
+NET "PCINC"  LOC = T14;
+NET "LPC"    LOC = C5;
+NET "LAR"    LOC = E6;
+NET "PCADD"  LOC = C11;
+NET "ARINC"  LOC = P15;
+NET "SELCTL" LOC = B10;
+NET "MEMW"   LOC = C8;
+NET "STOP"   LOC = C9;
+NET "LIR"    LOC = D8;
+NET "SBUS"   LOC = A8;
+NET "MBUS"   LOC = A14;
+NET "SHORT"  LOC = A6;
+NET "LONG"   LOC = B6;
+NET "SEL0"   LOC = C6;
+NET "SEL1"   LOC = A11;
+NET "SEL2"   LOC = C7;
+NET "SEL3"   LOC = A12;

@@ -74,14 +74,18 @@ docs/course/   课设 PDF/图片
 
 ---
 
-## Execution (pending approval)
+## Execution (handoff 2026-07-06)
 
-| Phase | Feature | Doc |
-|-------|---------|-----|
-| 基础 | CTL-F01, SIM-F01, HW-F01 | [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md) |
-| 进阶 | PL-F01 | [PL-F01_DESIGN](./designs/PL-F01_DESIGN.md) |
+| Phase | Feature | Status |
+|-------|---------|--------|
+| 工程纪律 | WF-F01 | **Done** |
+| 需求/设计 | 总纲 + ADR | **Approved** |
+| **基础 RTL** | CTL-F01 | **Done** |
+| **仿真** | SIM-F01 | **In Progress**（核心 PASS） |
+| **上板** | HW-F01 | **Planned** ← 下一步 |
+| 进阶 | PL-F01 | Planned |
 
-**审批前不编码。**
+详见 [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)、[ACTIVE_WORK](./ACTIVE_WORK.md)。
 
 ---
 

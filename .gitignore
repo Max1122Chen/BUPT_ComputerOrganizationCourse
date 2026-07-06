@@ -23,7 +23,6 @@ ise/*.xrpt
 
 # Simulation
 sim/work/
-sim/transcript
 *.wlf
 *.vcd
 *.log

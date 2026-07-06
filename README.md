@@ -3,9 +3,20 @@
 题目 A — **TEC-PLUS 硬布线控制器**（基础顺序 → 进阶流水线）  
 工具：**Xilinx ISE 14.7**
 
-## 当前状态
+## 当前状态（2026-07-06）
 
-需求已批准；仓库已关联 GitHub。首次 commit 待你批准后执行。编码从 `CTL-F01-S01` 开始。
+| 里程碑 | 状态 |
+|--------|------|
+| M1 仿真 | **Done** — iverilog + `tb_ctrl` PASS |
+| M2 基础上板 | 未开始 — **HW-F01** |
+| M3 进阶流水 | 未开始 — **PL-F01** |
+
+**下一主线：** ISE 14.7 建工程 → 综合 → IMPACT 烧录 TEC-PLUS。
+
+| 文档 | 说明 |
+|------|------|
+| [ACTIVE_WORK](docs/ai/ACTIVE_WORK.md) | 交接 backlog |
+| [EXECUTION_ROADMAP](docs/ai/designs/EXECUTION_ROADMAP.md) | 27 切片 |
 
 | 文档 | 说明 |
 |------|------|

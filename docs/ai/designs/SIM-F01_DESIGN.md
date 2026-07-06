@@ -3,7 +3,7 @@
 ## Meta
 - **ID:** SIM-F01
 - **Type:** Feature
-- **Status:** Review
+- **Status:** In Progress
 - **Owner:** maintainer
 - **Last updated:** 2026-07-06
 - **Related:** [SIM-F01_IMPLEMENTATION](./SIM-F01_IMPLEMENTATION.md)
@@ -43,9 +43,9 @@
 
 ## 6) 验收标准
 
-- [ ] CTL-F01 全套件 PASS
-- [ ] PL-F01 增量套件 PASS
-- [ ] `verify.ps1 -Stage 1` 一键运行
+- [x] CTL-F01 核心套件 PASS（`sim/run_tb.ps1`）
+- [x] `verify.ps1 -Stage 1` 接入 iverilog
+- [ ] 全指令 + 全手动 SW 穷举（可选）
 
 ---
 

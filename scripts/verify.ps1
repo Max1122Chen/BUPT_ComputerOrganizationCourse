@@ -38,13 +38,19 @@ function Test-Stage0 {
 
 function Test-Stage1 {
     Write-StageHeader "Stage 1: simulation smoke"
-    $tb = Get-ChildItem -Path (Join-Path $RepoRoot "sim") -Filter "*_tb.v" -ErrorAction SilentlyContinue
-    if (-not $tb) {
-        Write-Host "SKIP: no testbench under sim/ (add sim/*_tb.v to enable)" -ForegroundColor Yellow
+    $tb = Join-Path $RepoRoot "sim\tb_ctrl.v"
+    if (-not (Test-Path $tb)) {
+        Write-Host "SKIP: sim/tb_ctrl.v not found" -ForegroundColor Yellow
         return
     }
-  # TODO: wire ModelSim/Questa or iverilog when toolchain is confirmed
-    throw "Stage 1 not wired yet. Add sim runner here after SIM-F01."
+    $iverilog = Get-Command iverilog -ErrorAction SilentlyContinue
+    if (-not $iverilog) {
+        Write-Host "SKIP: iverilog not on PATH; run sim/run_tb.ps1 when installed" -ForegroundColor Yellow
+        Write-Host "OK: tb_ctrl.v present (manual sim pending)"
+        return
+    }
+    & (Join-Path $RepoRoot "sim\run_tb.ps1")
+    if ($LASTEXITCODE -ne 0) { throw "sim/run_tb.ps1 failed with exit $LASTEXITCODE" }
 }
 
 function Test-Stage2 {

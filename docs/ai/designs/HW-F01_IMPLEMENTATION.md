@@ -16,7 +16,7 @@
 
 | Slice ID | 内容 | 状态 | 验证 |
 |----------|------|------|------|
-| HW-F01-S01 | `constraints/tecplus.ucf` 自图片-47 | Planned | UCF 与 top 端口核对 |
+| HW-F01-S01 | `constraints/tecplus.ucf` 自图片-47 | **Done** | UCF 与 top 端口核对 |
 | HW-F01-S02 | ISE 工程 `ise/` 创建 | Planned | 工程打开 |
 | HW-F01-S03 | 综合 + Place & Route | Planned | `.bit` 生成 |
 | HW-F01-S04 | IMPACT 烧录 + 顺序版程序 | Planned | 上板 PASS + Progress |

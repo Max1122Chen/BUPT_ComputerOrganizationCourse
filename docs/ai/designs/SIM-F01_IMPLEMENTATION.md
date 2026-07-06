@@ -16,9 +16,9 @@
 
 | Slice ID | 内容 | 状态 | 验证 |
 |----------|------|------|------|
-| SIM-F01-S01 | `tb_ctrl.v` + 向量解析框架 | Planned | 空表编译 |
-| SIM-F01-S02 | 黄金表 + CTL 全指令套件 | Planned | sim PASS |
-| SIM-F01-S03 | `verify.ps1` Stage 1 接入 | Planned | `verify -Stage 1` |
+| SIM-F01-S01 | `tb_ctrl.v` + 向量解析框架 | **Done** | 编译 |
+| SIM-F01-S02 | 黄金表 + CTL 核心指令套件 | **Done** | sim PASS |
+| SIM-F01-S03 | `verify.ps1` Stage 1 接入 | **Done** | verify -Stage 1 |
 
 ---
 

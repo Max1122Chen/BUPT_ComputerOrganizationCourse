@@ -64,10 +64,9 @@ Full checklist: [DOC_GOVERNANCE.md](./templates/DOC_GOVERNANCE.md) §7.
 
 | What | Command |
 |------|---------|
-| **Verify (default)** | `.\scripts\verify.ps1` from repo root |
-| Stage 0 — sanity | `.\scripts\verify.ps1 -Stage 0` |
-| Stage 1 — sim smoke | `.\scripts\verify.ps1 -Stage 1`（待 RTL） |
-| Stage 2 — ISE compile | `.\scripts\verify.ps1 -Stage 2`（待 `ise/` 工程） |
+| **Verify (default)** | `.\scripts\verify.ps1` — Stage 0/1 PASS；Stage 2 待 ISE |
+| Sim only | `.\sim\run_tb.ps1` |
+| iverilog | `%LOCALAPPDATA%\iverilog\bin`（见 `sim/README.md`） |
 
 Record which command you ran in `PROGRESS_LOG.md`.
 

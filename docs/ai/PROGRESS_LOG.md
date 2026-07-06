@@ -31,4 +31,33 @@
 - **Validation done:** 文档自检；`verify.ps1 -Stage 0` PASS
 - **Next step:** 用户审批 → CTL-F01-S01
 
+### 2026-07-06 — CTL-F01 基础阶段 RTL 实现 (CTL-F01-S01–S10)
+
+- **Goal:** 顺序硬布线控制器 Verilog + 仿真框架
+- **Main changes:**
+  - `rtl/controller/hardwired_ctrl.v` — 14 指令 + 手动 SW 模式
+  - `rtl/top/top.v` — 与图片-47 端口一致
+  - `constraints/tecplus.ucf` — Spartan-6 引脚
+  - `sim/tb_ctrl.v`, `sim/golden/ctl_vectors.txt`, `sim/run_tb.ps1`
+  - `verify.ps1` Stage 1 支持 iverilog
+- **Risks or caveats:** 本机无 iverilog，Stage 1 跳过；OUT/DI/EI/IRET 仍为暂定控制字
+- **Validation done:** `verify.ps1 -Stage 0` PASS
+- **Next step:** HW-F01 ISE 工程 + 上板，或安装 iverilog 跑仿真
+
+### 2026-07-06 — iverilog 安装与仿真通过 (SIM-F01)
+
+- **Goal:** 本机仿真环境 + 修复 tb 使控制向量测试通过
+- **Main changes:**
+  - 安装 iverilog 12.0 至 `%LOCALAPPDATA%\iverilog`（bleyer 安装包）
+  - 修复 `tb_ctrl.v`：`ir` 8 位宽、IR7–IR4 接线
+  - 更新 `sim/README.md`、文档状态
+- **Validation done:** `.\sim\run_tb.ps1` PASS；`verify.ps1 -Stage 1` PASS
+- **Next step:** HW-F01 ISE 工程 + 上板
+
+### 2026-07-06 — 文档状态同步（commit 前）
+
+- **Goal:** 交接用文档与 Feature 状态对齐当前进度
+- **Main changes:** ACTIVE_WORK、FEATURE_REGISTRY、EXECUTION_ROADMAP、CTL/SIM 状态 → Done/In Progress
+- **Next step:** 本 commit 批准后 → HW-F01-S02
+
 <!-- 新条目请用 templates/progress-log-entry.template.md 格式追加在上方 -->

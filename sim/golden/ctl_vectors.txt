@@ -1,0 +1,14 @@
+# Golden control vectors (reference for SIM-F01-S02)
+# Format: IR(hex) phase(W1=1,W2=2,W3=4) flags(CZ) SW(hex) -> key signals
+#
+# ADD Rd,Rs  IR=0x11  W2: S=1001 CIN ABUS DRW LDZ LDC SELCTL SHORT
+# SUB        IR=0x20  W2: S=0110 ABUS DRW LDZ LDC SELCTL SHORT
+# AND        IR=0x33  W2: M S=1011 ABUS DRW LDZ SELCTL SHORT
+# INC        IR=0x40  W2: S=0000 ABUS DRW LDZ LDC SELCTL SHORT
+# LD         IR=0x51  W2: M S=1010 ABUS LAR LONG SELCTL | W3: DRW MBUS
+# ST         IR=0x62  W2: M S=1111 ABUS LAR LONG SELCTL | W3: S=1010 M ABUS MEMW
+# JC         IR=0x7n  W2: PCADD if C else none
+# JZ         IR=0x8n  W2: PCADD if Z
+# JMP        IR=0x91  W2: M S=1111 ABUS LPC SELCTL SHORT
+# STP        IR=0xE0  W2: STOP SHORT
+# W1 fetch   any      W1: LIR; PCINC when T3=1

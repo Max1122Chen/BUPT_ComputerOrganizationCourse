@@ -2,7 +2,7 @@
 
 ## Meta
 - **ID:** CTL-F01
-- **Status:** Review
+- **Status:** Done
 - **Owner:** maintainer
 - **Last updated:** 2026-07-06
 - **Related:** [CTL-F01_DESIGN](./CTL-F01_DESIGN.md)
@@ -22,16 +22,16 @@
 
 | Slice ID | 内容 | 状态 | 验证 |
 |----------|------|------|------|
-| CTL-F01-S01 | 顶层端口 + `hardwired_ctrl` 骨架 | Planned | 编译（lint） |
-| CTL-F01-S02 | W1 取指：`LIR`,`PCINC` + 默认 idle | Planned | sim: fetch |
-| CTL-F01-S03 | RR 型：ADD,SUB,AND,INC | Planned | sim: alu4 |
-| CTL-F01-S04 | LD, ST（W2+W3,LONG） | Planned | sim: ld/st |
-| CTL-F01-S05 | JC, JZ, JMP | Planned | sim: branch |
-| CTL-F01-S06 | STP | Planned | sim: stp |
-| CTL-F01-S07 | 手动 SW 模式 001/010/011/100 | Planned | sim: manual |
-| CTL-F01-S08 | OUT, IRET, DI, EI | Planned | sim + 备注待上板 |
-| CTL-F01-S09 | `top` 集成 + SHORT/LONG 完整 | Planned | sim: full isa |
-| CTL-F01-S10 | 黄金向量表固化 + 文档 | Planned | verify Stage 1 预备 |
+| CTL-F01-S01 | 顶层端口 + `hardwired_ctrl` 骨架 | **Done** | 编译（lint） |
+| CTL-F01-S02 | W1 取指：`LIR`,`PCINC` + 默认 idle | **Done** | sim: fetch |
+| CTL-F01-S03 | RR 型：ADD,SUB,AND,INC | **Done** | sim: alu4 |
+| CTL-F01-S04 | LD, ST（W2+W3,LONG） | **Done** | sim: ld/st |
+| CTL-F01-S05 | JC, JZ, JMP | **Done** | sim: branch |
+| CTL-F01-S06 | STP | **Done** | sim: stp |
+| CTL-F01-S07 | 手动 SW 模式 001/010/011/100 | **Done** | sim: manual |
+| CTL-F01-S08 | OUT, IRET, DI, EI | **Done** | sim + 备注待上板 |
+| CTL-F01-S09 | `top` 集成 + SHORT/LONG 完整 | **Done** | sim: full isa |
+| CTL-F01-S10 | 黄金向量表固化 + 文档 | **Done** | verify Stage 1 预备 |
 
 ---
 
@@ -118,4 +118,4 @@ S01 → S02 → S03 → S04 → S05 → S06 → S07 → S08 → S09 → S10
 
 | 日期 | 说明 |
 |------|------|
-| 2026-07-06 | 初稿待审批 |
+| 2026-07-06 | 全部切片 Done；仿真核心 PASS |
