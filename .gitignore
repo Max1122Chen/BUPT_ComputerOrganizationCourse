@@ -1,0 +1,41 @@
+# Xilinx ISE
+ise/_xmsgs/
+ise/*.log
+ise/*.jou
+ise/xst/
+ise/*.ncd
+ise/*.ngc
+ise/*.bgn
+ise/*.bld
+ise/*.drc
+ise/*.ll
+ise/*.lso
+ise/*.pad
+ise/*.par
+ise/*.pcf
+ise/*.ptwx
+ise/*.unroutes
+ise/*.xpi
+ise/*.xrpt
+*.bit
+*.mcs
+*.prm
+
+# Simulation
+sim/work/
+sim/transcript
+*.wlf
+*.vcd
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Local scratch
+scratch/
+*.tmp

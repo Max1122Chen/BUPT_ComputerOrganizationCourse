@@ -1,0 +1,24 @@
+---
+description: Session bootstrap for BUPT computer organization course project.
+alwaysApply: true
+---
+
+# Session bootstrap
+
+At the start of a substantive task (or when user says continue / 继续课设):
+
+1. Read `docs/ai/PROJECT_CONTEXT.md`, recent `PROGRESS_LOG.md`, `ACTIVE_WORK.md`, `BOOTSTRAP_DIGEST.md`
+2. Run `git status --short --branch` if in a git repo
+3. Output a **4–8 line** snapshot: platform status, current Feature/Slice, last validation, proposed next step
+4. Do **not** infer backlog from `docs/course/` PDF or unchecked old designs
+
+Workflow triggers:
+
+| User intent | Action |
+|-------------|--------|
+| 计划 / 设计 / 新模块 | Register Feature → Design → Pre-flight |
+| slice 完成 / 做完了 | Slice DoD → offer 准备 commit |
+| handoff / 交接 | Session note + Progress; Blocked slices marked |
+| 准备 commit | Draft only until approval |
+
+See `docs/ai/WORKING_WITH_AI.md`.

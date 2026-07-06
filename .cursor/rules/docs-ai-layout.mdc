@@ -1,0 +1,19 @@
+---
+description: Where to place new docs/ai files; layout for FPGA course project.
+alwaysApply: true
+---
+
+# docs/ai layout
+
+| Path | Put here |
+|------|----------|
+| `docs/ai/designs/` | `*_DESIGN.md`, `*_IMPLEMENTATION.md` |
+| `docs/ai/adrs/` | `ADR-*.md` |
+| `docs/ai/bugs/` | `BUG-*.md` |
+| `docs/ai/sessions/` | Session notes |
+| `docs/ai/templates/` | Templates only — do not edit in place for real work |
+| `docs/course/` | Course PDF/images — read-only reference |
+
+New Feature: copy template → fill Meta → register FEATURE_REGISTRY first.
+
+Do not put Verilog in `docs/`. Do not put design prose in `rtl/`.

@@ -1,0 +1,36 @@
+---
+description: Non-negotiable constraints for commits, Verilog style, and context recovery.
+alwaysApply: true
+---
+
+# Hard Constraints (always)
+
+## 1) Commit preparation (mandatory gate)
+
+When the user asks to prepare a commit (准备commit / 准备提交 / 我要commit / commit message):
+
+- **Prepare ≠ execute:** draft message + wait for approval, not immediate `git commit`.
+- Inspect staged/unstaged changes first; draft from **actual** diffs only.
+- Use **Conventional Commits:** `type(scope): summary` (`feat`, `fix`, `refactor`, `docs`, `chore`).
+- **Summary = concrete work**, not Feature/Slice IDs; optional `Refs:` footnote only.
+- Run Doc DoD checks per `docs/ai/templates/DOC_GOVERNANCE.md` §7 when feature-driven.
+- **NEVER** `git commit` or `git push` unless user clearly approves the draft and asks to execute.
+
+## 2) Verilog / HDL style
+
+When writing or editing `.v`, `.sv`, `.vh`:
+
+- Follow `docs/ai/CODING_STYLE.md`.
+- Control signal names must match the lab platform (`LIR`, `PCINC`, `SEL0`, etc.).
+- Sequential logic: non-blocking `<=`; combinational: `always @(*)` with full assignment coverage.
+- Large controller refactors: Pre-flight per DOC_GOVERNANCE §10 before coding.
+
+## 3) Context recovery
+
+Re-read and apply sections 1–2 when:
+
+- New session, summarized history, or "continue previous task"
+- User says re-bootstrap / 对齐约束
+- Before non-trivial RTL changes or commit-related actions
+
+Do not repeat full rule text unless asked.

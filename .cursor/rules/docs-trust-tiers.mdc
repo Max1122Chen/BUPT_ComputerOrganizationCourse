@@ -1,0 +1,45 @@
+---
+description: Which docs/ai files agents may use for planning vs background only; RTL and verify win over stale docs.
+alwaysApply: true
+---
+
+# docs/ai trust tiers (agents)
+
+Full policy: `docs/ai/templates/DOC_GOVERNANCE.md` §5. Human backlog: `docs/ai/ACTIVE_WORK.md`.
+
+## Tier A — planning sources (may drive work)
+
+- `docs/ai/PROJECT_CONTEXT.md`
+- `docs/ai/PROGRESS_LOG.md` (recent entries only)
+- `docs/ai/BOOTSTRAP_DIGEST.md`
+- `docs/ai/ACTIVE_WORK.md`
+- `docs/ai/FEATURE_REGISTRY.md` — **In Progress** or **Planned** only
+- `docs/ai/TECH_DEBT.md` — **Open** rows only
+- User-named design with Meta Status `In Progress` or `Review`
+
+## Tier B — reference only (do not build backlog from)
+
+- `docs/course/` — PDF and reference images
+- Designs with Status Done / Snapshot / Archived / Reference
+- Unchecked checklists in old docs
+- `docs/ai/sessions/`
+
+## Tier C — code is truth
+
+If Tier A/B disagrees with **RTL**, **simulation waves**, or **`verify.ps1` results**:
+
+1. Trust code + verification for current behavior.
+2. State doc may be stale; do not treat gaps as mandatory work unless user or ACTIVE_WORK asks.
+
+## Conflicts
+
+| Situation | Resolution |
+|-----------|------------|
+| Doc vs RTL/sim | RTL + verify |
+| Doc vs user this session | User |
+| ACTIVE_WORK vs course PDF | ACTIVE_WORK |
+| FEATURE_REGISTRY Planned vs no ACTIVE_WORK | Ask user |
+
+## New work
+
+Register in FEATURE_REGISTRY; update ACTIVE_WORK when user wants agent-visible priority.
