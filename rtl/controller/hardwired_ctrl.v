@@ -180,6 +180,7 @@ module hardwired_ctrl (
         end else begin
             case (sw)
                 3'b100: begin
+                    SHORT = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
                     if (W1) begin
                         SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
                         if (!STO) begin

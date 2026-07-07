@@ -47,8 +47,18 @@ module top (
     output wire       SEL3
 );
 
-    // CLR_n and STO are board signals; controller is combinational on W/IR/SW.
-    wire sto = 1'b0;
+    // STO: internal toggle in manual mem/reg-write modes (no FPGA pin on image-47).
+    wire sto;
+
+    manual_sto u_sto (
+        .CLR_n (CLR_n),
+        .T3    (T3),
+        .SWA   (SWA),
+        .SWB   (SWB),
+        .SWC   (SWC),
+        .W1    (W1),
+        .STO   (sto)
+    );
 
     hardwired_ctrl u_ctrl (
         .T3     (T3),
