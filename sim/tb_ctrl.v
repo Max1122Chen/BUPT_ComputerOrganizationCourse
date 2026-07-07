@@ -64,6 +64,7 @@ module tb_ctrl;
         expect1(PCINC, 1'b0, "fetch PCINC before T3");
         T3 = 1; #1;
         expect1(PCINC, 1'b1, "fetch PCINC at T3");
+        expect1(SHORT, 1'b0, "fetch W1 must not assert SHORT");
         clear_w(); T3 = 0;
 
         // --- W2 ADD ---
@@ -95,6 +96,7 @@ module tb_ctrl;
         W3 = 1; #1;
         expect1(DRW, 1'b1, "LD W3 DRW");
         expect1(MBUS, 1'b1, "LD W3 MBUS");
+        expect1(SHORT, 1'b1, "LD W3 SHORT");
         clear_w();
 
         // --- W2 ST + W3 ---
@@ -104,6 +106,7 @@ module tb_ctrl;
         clear_w();
         W3 = 1; #1;
         expect1(MEMW, 1'b1, "ST W3 MEMW");
+        expect1(SHORT, 1'b1, "ST W3 SHORT");
         clear_w();
 
         // --- JC taken / not taken ---

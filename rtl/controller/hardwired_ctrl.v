@@ -67,8 +67,6 @@ module hardwired_ctrl (
     localparam OP_EI   = 4'b1101;
     localparam OP_STP  = 4'b1110;
 
-    wire is_mem_instr = (ir_op == OP_LD) || (ir_op == OP_ST);
-
     always @(*) begin
         DRW    = 1'b0;
         PCINC  = 1'b0;
@@ -100,11 +98,11 @@ module hardwired_ctrl (
 
         if (instr_mode) begin
             if (W1) begin
+                // W1 fetch: LIR/PCINC only. Do NOT assert SHORT here — on TEC
+                // timing gen, SHORT@W1 skips W2 and stays on W1.
                 LIR = 1'b1;
                 if (T3)
                     PCINC = 1'b1;
-                if (!is_mem_instr)
-                    SHORT = 1'b1;
             end
 
             if (W2) begin
@@ -170,11 +168,11 @@ module hardwired_ctrl (
             if (W3) begin
                 case (ir_op)
                     OP_LD: begin
-                        DRW = 1'b1; MBUS = 1'b1;
+                        DRW = 1'b1; MBUS = 1'b1; SHORT = 1'b1;
                     end
                     OP_ST: begin
                         M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
-                        ABUS = 1'b1; MEMW = 1'b1;
+                        ABUS = 1'b1; MEMW = 1'b1; SHORT = 1'b1;
                     end
                     default: ;
                 endcase
