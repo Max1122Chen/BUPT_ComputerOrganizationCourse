@@ -7,8 +7,15 @@ New-Item -ItemType Directory -Force -Path $Work | Out-Null
 iverilog -o (Join-Path $Work "tb_ctrl.out") `
     (Join-Path $Root "rtl\controller\hardwired_ctrl.v") `
     (Join-Path $Root "sim\tb_ctrl.v")
-
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 vvp (Join-Path $Work "tb_ctrl.out")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+iverilog -o (Join-Path $Work "tb_manual_sto.out") `
+    (Join-Path $Root "rtl\common\manual_sto.v") `
+    (Join-Path $Root "sim\tb_manual_sto.v")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+vvp (Join-Path $Work "tb_manual_sto.out")
 exit $LASTEXITCODE

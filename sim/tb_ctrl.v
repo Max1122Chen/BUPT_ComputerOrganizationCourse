@@ -159,13 +159,53 @@ module tb_ctrl;
         expect1(LPC, 1'b1, "IRET LPC");
         clear_w();
 
-        // --- manual write reg SW=100 ---
-        SWC = 1; SWB = 0; SWA = 0;
+        // --- manual read reg SW=011 ---
+        SWC = 0; SWB = 1; SWA = 1;
         W1 = 1; #1;
-        expect1(SBUS, 1'b1, "wrreg SBUS");
-        expect1(DRW, 1'b1, "wrreg DRW");
-        expect1(SEL1, 1'b1, "wrreg SEL1");
-        expect1(SEL0, 1'b1, "wrreg SEL0");
+        expect1(SEL0, 1'b1, "rdreg W1 SEL0");
+        expect1(SELCTL, 1'b1, "rdreg W1 SELCTL");
+        expect1(STOP, 1'b1, "rdreg W1 STOP");
+        expect1(DRW, 1'b0, "rdreg W1 no DRW");
+        clear_w();
+        W2 = 1; #1;
+        expect1(SEL3, 1'b1, "rdreg W2 SEL3");
+        expect1(SEL2, 1'b0, "rdreg W2 no SEL2");
+        expect1(SEL1, 1'b1, "rdreg W2 SEL1");
+        expect1(SEL0, 1'b1, "rdreg W2 SEL0");
+        expect1(SELCTL, 1'b1, "rdreg W2 SELCTL");
+        expect1(STOP, 1'b1, "rdreg W2 STOP");
+        expect1(DRW, 1'b0, "rdreg W2 no DRW");
+        SWC = 0; SWB = 0; SWA = 0;
+        clear_w();
+
+        // --- manual write reg SW=100 ---
+        SWC = 1; SWB = 0; SWA = 0; STO = 0;
+        W1 = 1; #1;
+        expect1(SBUS, 1'b1, "wrreg sto0 W1 SBUS");
+        expect1(DRW, 1'b1, "wrreg sto0 W1 DRW");
+        expect1(SEL1, 1'b1, "wrreg sto0 W1 SEL1");
+        expect1(SEL0, 1'b1, "wrreg sto0 W1 SEL0");
+        expect1(SHORT, 1'b0, "wrreg W1 no SHORT");
+        clear_w();
+        W2 = 1; #1;
+        expect1(SBUS, 1'b1, "wrreg sto0 W2 SBUS");
+        expect1(DRW, 1'b1, "wrreg sto0 W2 DRW");
+        expect1(SEL2, 1'b1, "wrreg sto0 W2 SEL2");
+        expect1(SHORT, 1'b0, "wrreg W2 no SHORT");
+        clear_w();
+        STO = 1;
+        W1 = 1; #1;
+        expect1(SBUS, 1'b1, "wrreg sto1 W1 SBUS");
+        expect1(DRW, 1'b1, "wrreg sto1 W1 DRW");
+        expect1(SEL3, 1'b1, "wrreg sto1 W1 SEL3");
+        expect1(SEL0, 1'b1, "wrreg sto1 W1 SEL0");
+        clear_w();
+        W2 = 1; #1;
+        expect1(SBUS, 1'b1, "wrreg sto1 W2 SBUS");
+        expect1(DRW, 1'b1, "wrreg sto1 W2 DRW");
+        expect1(SEL3, 1'b1, "wrreg sto1 W2 SEL3");
+        expect1(SEL2, 1'b1, "wrreg sto1 W2 SEL2");
+        expect1(SEL1, 1'b1, "wrreg sto1 W2 SEL1");
         SWC = 0; SWB = 0; SWA = 0;
         clear_w();
 
