@@ -180,7 +180,6 @@ module hardwired_ctrl (
         end else begin
             case (sw)
                 3'b100: begin
-                    SHORT = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
                     if (W1) begin
                         SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
                         if (!STO) begin
@@ -189,14 +188,22 @@ module hardwired_ctrl (
                             SEL3 = 1'b1; SEL0 = 1'b1;
                         end
                     end
+                    if (W2) begin
+                        SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
+                        if (!STO) begin
+                            SEL2 = 1'b1;
+                        end else begin
+                            SEL3 = 1'b1; SEL2 = 1'b1; SEL1 = 1'b1;
+                        end
+                    end
                 end
                 3'b011: begin
                     if (W1) begin
                         SEL0 = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
                     end
                     if (W2) begin
-                        SBUS = 1'b1; SEL2 = 1'b1; SEL1 = 1'b1;
-                        SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
+                        SEL3 = 1'b1; SEL1 = 1'b1; SEL0 = 1'b1;
+                        SELCTL = 1'b1; STOP = 1'b1;
                     end
                 end
                 3'b010: begin

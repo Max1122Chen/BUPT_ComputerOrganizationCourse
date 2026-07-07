@@ -57,6 +57,7 @@ module top (
         .SWB   (SWB),
         .SWC   (SWC),
         .W1    (W1),
+        .W2    (W2),
         .STO   (sto)
     );
 
