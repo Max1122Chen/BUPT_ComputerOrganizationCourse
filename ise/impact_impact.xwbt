@@ -1,0 +1,8 @@
+INTSTYLE=impact
+INFILE=D:\ISEproject\CourseDesign\impact.xsl
+OUTFILE=D:\ISEproject\CourseDesign\impact.xsl
+FAMILY=Single
+PART=Single
+WORKINGDIR=D:\ISEproject\CourseDesign
+LICENSE=iMPACT
+USER_INFO=iMPACT

@@ -1,0 +1,286 @@
+--------------------------------------------------------------------------------
+Release 14.7 Trace  (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+D:\ISE\14.7\ISE_DS\ISE\bin\nt64\unwrapped\trce.exe -intstyle ise -v 3 -s 2 -n 3
+-fastpaths -xml top.twx top.ncd -o top.twr top.pcf -ucf tecplus.ucf
+
+Design file:              top.ncd
+Physical constraint file: top.pcf
+Device,package,speed:     xc6slx9,ftg256,C,-2 (PRODUCTION 1.23 2013-10-13)
+Report level:             verbose report
+
+Environment Variable      Effect 
+--------------------      ------ 
+NONE                      No environment variables were set
+--------------------------------------------------------------------------------
+
+INFO:Timing:2698 - No timing constraints found, doing default enumeration.
+INFO:Timing:3412 - To improve timing, see the Timing Closure User Guide (UG612).
+INFO:Timing:2752 - To get complete path coverage, use the unconstrained paths 
+   option. All paths that are not constrained will be reported in the 
+   unconstrained paths section(s) of the report.
+INFO:Timing:3339 - The clock-to-out numbers in this timing report are based on 
+   a 50 Ohm transmission line loading model.  For the details of this model, 
+   and for more information on accounting for different loading conditions, 
+   please see the device datasheet.
+
+
+
+Data Sheet report:
+-----------------
+All values displayed in nanoseconds (ns)
+
+Setup/Hold to clock T3
+------------+------------+------------+------------+------------+------------------+--------+
+            |Max Setup to|  Process   |Max Hold to |  Process   |                  | Clock  |
+Source      | clk (edge) |   Corner   | clk (edge) |   Corner   |Internal Clock(s) | Phase  |
+------------+------------+------------+------------+------------+------------------+--------+
+CLR_n       |    2.476(R)|      SLOW  |   -0.785(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SWA         |    4.701(R)|      SLOW  |   -1.113(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SWB         |    6.013(R)|      SLOW  |   -1.951(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SWC         |    4.161(R)|      SLOW  |   -0.712(R)|      SLOW  |T3_IBUF_BUFG      |   0.000|
+W1          |    5.704(R)|      SLOW  |   -1.517(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+------------+------------+------------+------------+------------+------------------+--------+
+
+Clock T3 to Pad
+------------+-----------------+------------+-----------------+------------+------------------+--------+
+            |Max (slowest) clk|  Process   |Min (fastest) clk|  Process   |                  | Clock  |
+Destination |  (edge) to PAD  |   Corner   |  (edge) to PAD  |   Corner   |Internal Clock(s) | Phase  |
+------------+-----------------+------------+-----------------+------------+------------------+--------+
+ARINC       |        12.108(R)|      SLOW  |         5.404(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+LAR         |        10.664(R)|      SLOW  |         4.530(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+MBUS        |        11.907(R)|      SLOW  |         5.327(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+MEMW        |        11.315(R)|      SLOW  |         4.971(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SBUS        |        10.239(R)|      SLOW  |         4.287(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SEL1        |        11.220(R)|      SLOW  |         4.955(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+SEL3        |        11.002(R)|      SLOW  |         4.789(R)|      FAST  |T3_IBUF_BUFG      |   0.000|
+------------+-----------------+------------+-----------------+------------+------------------+--------+
+
+Clock to Setup on destination clock T3
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+T3             |    2.925|         |         |         |
+---------------+---------+---------+---------+---------+
+
+Pad to Pad
+---------------+---------------+---------+
+Source Pad     |Destination Pad|  Delay  |
+---------------+---------------+---------+
+C              |PCADD          |   10.122|
+IR4            |ABUS           |   13.022|
+IR4            |CIN            |    9.715|
+IR4            |DRW            |   12.147|
+IR4            |LAR            |   12.891|
+IR4            |LDC            |   12.662|
+IR4            |LDZ            |   13.046|
+IR4            |LONG           |   13.031|
+IR4            |LPC            |   12.487|
+IR4            |M              |   13.370|
+IR4            |MBUS           |   12.287|
+IR4            |MEMW           |   11.928|
+IR4            |PCADD          |   13.555|
+IR4            |S0             |   11.054|
+IR4            |S1             |   10.727|
+IR4            |S2             |   11.692|
+IR4            |S3             |   12.689|
+IR4            |SELCTL         |   12.807|
+IR4            |SHORT          |   13.363|
+IR4            |STOP           |   13.081|
+IR5            |ABUS           |   10.744|
+IR5            |CIN            |   12.254|
+IR5            |DRW            |   10.946|
+IR5            |LAR            |   10.389|
+IR5            |LDC            |   10.380|
+IR5            |LDZ            |   11.845|
+IR5            |LONG           |   10.529|
+IR5            |M              |   10.868|
+IR5            |MBUS           |   11.087|
+IR5            |MEMW           |    9.650|
+IR5            |PCADD          |   11.162|
+IR5            |S0             |   13.683|
+IR5            |S1             |   11.091|
+IR5            |S2             |   14.321|
+IR5            |S3             |   12.681|
+IR5            |SELCTL         |   10.714|
+IR5            |SHORT          |   11.270|
+IR6            |ABUS           |   13.189|
+IR6            |CIN            |    9.829|
+IR6            |DRW            |   12.388|
+IR6            |LAR            |   12.008|
+IR6            |LDC            |   11.344|
+IR6            |LDZ            |   13.287|
+IR6            |LONG           |   12.148|
+IR6            |LPC            |   11.674|
+IR6            |M              |   12.487|
+IR6            |MBUS           |   12.519|
+IR6            |MEMW           |   12.095|
+IR6            |PCADD          |   12.437|
+IR6            |S0             |   11.357|
+IR6            |S1             |   10.354|
+IR6            |S2             |   11.995|
+IR6            |S3             |   12.119|
+IR6            |SELCTL         |   13.063|
+IR6            |SHORT          |   13.619|
+IR6            |STOP           |   12.234|
+IR7            |ABUS           |   10.378|
+IR7            |CIN            |   12.513|
+IR7            |DRW            |   10.965|
+IR7            |LAR            |   10.468|
+IR7            |LDC            |   10.005|
+IR7            |LDZ            |   11.864|
+IR7            |LONG           |   10.608|
+IR7            |LPC            |   10.263|
+IR7            |M              |   10.947|
+IR7            |MBUS           |   11.208|
+IR7            |MEMW           |    9.284|
+IR7            |PCADD          |   10.971|
+IR7            |S0             |   13.389|
+IR7            |S1             |   11.422|
+IR7            |S2             |   14.027|
+IR7            |S3             |   12.591|
+IR7            |SELCTL         |   10.626|
+IR7            |SHORT          |   11.182|
+IR7            |STOP           |   10.860|
+SWA            |ABUS           |   14.566|
+SWA            |ARINC          |   11.801|
+SWA            |CIN            |   16.266|
+SWA            |DRW            |   15.151|
+SWA            |LAR            |   13.201|
+SWA            |LDC            |   12.305|
+SWA            |LDZ            |   15.628|
+SWA            |LIR            |   11.027|
+SWA            |LONG           |   13.341|
+SWA            |LPC            |   13.145|
+SWA            |M              |   13.680|
+SWA            |MBUS           |   15.417|
+SWA            |MEMW           |   13.472|
+SWA            |PCADD          |   12.030|
+SWA            |PCINC          |   12.524|
+SWA            |S0             |   10.655|
+SWA            |S1             |   10.183|
+SWA            |S2             |   11.169|
+SWA            |S3             |   11.445|
+SWA            |SBUS           |   10.973|
+SWA            |SEL0           |   11.850|
+SWA            |SEL1           |   12.085|
+SWA            |SEL2           |   11.769|
+SWA            |SEL3           |   10.695|
+SWA            |SELCTL         |   12.393|
+SWA            |SHORT          |   11.674|
+SWA            |STOP           |   11.451|
+SWB            |ABUS           |   12.106|
+SWB            |ARINC          |   14.073|
+SWB            |CIN            |   13.806|
+SWB            |DRW            |   15.701|
+SWB            |LAR            |   10.741|
+SWB            |LDC            |    9.845|
+SWB            |LDZ            |   13.168|
+SWB            |LIR            |   13.253|
+SWB            |LONG           |   10.881|
+SWB            |LPC            |   10.685|
+SWB            |M              |   11.220|
+SWB            |MBUS           |   13.362|
+SWB            |MEMW           |   11.012|
+SWB            |PCADD          |    9.570|
+SWB            |PCINC          |   14.750|
+SWB            |S0             |   14.550|
+SWB            |S1             |   12.987|
+SWB            |S2             |   14.777|
+SWB            |S3             |   14.249|
+SWB            |SBUS           |    9.455|
+SWB            |SEL0           |   11.178|
+SWB            |SEL1           |   10.300|
+SWB            |SEL2           |   15.377|
+SWB            |SEL3           |   12.967|
+SWB            |SELCTL         |   10.400|
+SWB            |SHORT          |    9.724|
+SWB            |STOP           |    9.536|
+SWC            |ABUS           |   13.894|
+SWC            |ARINC          |   11.648|
+SWC            |CIN            |   15.594|
+SWC            |DRW            |   14.479|
+SWC            |LAR            |   12.529|
+SWC            |LDC            |   11.633|
+SWC            |LDZ            |   14.956|
+SWC            |LIR            |   10.804|
+SWC            |LONG           |   12.669|
+SWC            |LPC            |   12.473|
+SWC            |M              |   13.008|
+SWC            |MBUS           |   14.745|
+SWC            |MEMW           |   12.800|
+SWC            |PCADD          |   11.358|
+SWC            |PCINC          |   12.301|
+SWC            |S0             |   10.560|
+SWC            |S1             |    9.756|
+SWC            |S2             |   10.574|
+SWC            |S3             |   11.018|
+SWC            |SBUS           |   10.608|
+SWC            |SEL0           |   11.334|
+SWC            |SEL1           |   11.651|
+SWC            |SEL2           |   11.174|
+SWC            |SEL3           |   10.542|
+SWC            |SELCTL         |   11.663|
+SWC            |SHORT          |   11.601|
+SWC            |STOP           |   10.890|
+T3             |PCINC          |   11.835|
+W1             |ARINC          |   12.540|
+W1             |DRW            |   11.761|
+W1             |LAR            |   10.579|
+W1             |LIR            |   11.331|
+W1             |MBUS           |   11.015|
+W1             |MEMW           |    9.238|
+W1             |PCINC          |   12.828|
+W1             |SBUS           |    9.908|
+W1             |SEL0           |   10.188|
+W1             |SEL1           |    9.283|
+W1             |SEL3           |   11.434|
+W1             |SELCTL         |    9.841|
+W1             |STOP           |    9.726|
+W2             |ABUS           |   11.727|
+W2             |CIN            |   10.458|
+W2             |DRW            |   12.328|
+W2             |LAR            |   12.073|
+W2             |LDC            |   11.541|
+W2             |LDZ            |   13.227|
+W2             |LONG           |   12.213|
+W2             |LPC            |   11.945|
+W2             |M              |   12.552|
+W2             |PCADD          |   11.656|
+W2             |S0             |   10.828|
+W2             |S1             |   10.532|
+W2             |S2             |   10.846|
+W2             |S3             |   12.251|
+W2             |SBUS           |   11.196|
+W2             |SEL1           |   11.512|
+W2             |SEL2           |   11.446|
+W2             |SELCTL         |   11.593|
+W2             |SHORT          |   13.281|
+W2             |STOP           |   10.749|
+W3             |ABUS           |   15.897|
+W3             |DRW            |   13.535|
+W3             |M              |   14.708|
+W3             |MBUS           |   13.801|
+W3             |MEMW           |   14.803|
+W3             |S0             |   13.028|
+W3             |S1             |   12.854|
+W3             |S2             |   13.666|
+W3             |S3             |   14.260|
+W3             |SHORT          |   15.071|
+Z              |PCADD          |   10.813|
+---------------+---------------+---------+
+
+
+Analysis completed Tue Jul 07 11:41:26 2026 
+--------------------------------------------------------------------------------
+
+Trace Settings:
+-------------------------
+Trace Settings 
+
+Peak Memory Usage: 4597 MB
+
+
+
