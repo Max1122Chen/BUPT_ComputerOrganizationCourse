@@ -5,6 +5,7 @@
 module top (
     input  wire       CLR_n,
     input  wire       T3,
+    input  wire       QD,
     input  wire       SWA,
     input  wire       SWB,
     input  wire       SWC,
@@ -47,22 +48,10 @@ module top (
     output wire       SEL3
 );
 
-    // STO: internal toggle in manual mem/reg-write modes (no FPGA pin on image-47).
-    wire sto;
-
-    manual_sto u_sto (
-        .CLR_n (CLR_n),
-        .T3    (T3),
-        .SWA   (SWA),
-        .SWB   (SWB),
-        .SWC   (SWC),
-        .W1    (W1),
-        .W2    (W2),
-        .STO   (sto)
-    );
-
     hardwired_ctrl u_ctrl (
+        .CLR_n  (CLR_n),
         .T3     (T3),
+        .QD     (QD),
         .SWA    (SWA),
         .SWB    (SWB),
         .SWC    (SWC),
@@ -75,7 +64,6 @@ module top (
         .W3     (W3),
         .C      (C),
         .Z      (Z),
-        .STO    (sto),
         .DRW    (DRW),
         .PCINC  (PCINC),
         .LPC    (LPC),

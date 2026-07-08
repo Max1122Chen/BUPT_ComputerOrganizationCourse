@@ -1,10 +1,13 @@
-// TEC-PLUS hardwired controller — sequential (CTL-F01)
-// Control reference: docs/course/*-图片-43.jpg
+// TEC-PLUS hardwired controller — partner baseline replica (T3-clocked STO)
+// Source: partner controller.v (docs/状态转移-信号真值表.md)
+// STO: SSTO set in combo logic, latched on negedge T3 (after AR LAR load at T3↑).
 
 `timescale 1ns / 1ps
 
 module hardwired_ctrl (
+    input  wire       CLR_n,
     input  wire       T3,
+    input  wire       QD,       // board pin; not used in partner baseline
     input  wire       SWA,
     input  wire       SWB,
     input  wire       SWC,
@@ -17,7 +20,6 @@ module hardwired_ctrl (
     input  wire       W3,
     input  wire       C,
     input  wire       Z,
-    input  wire       STO,
 
     output reg        DRW,
     output reg        PCINC,
@@ -48,26 +50,43 @@ module hardwired_ctrl (
     output reg        SEL3
 );
 
-    wire [2:0] sw      = {SWC, SWB, SWA};
-    wire [3:0] ir_op   = {IR7, IR6, IR5, IR4};
-    wire       instr_mode = (sw == 3'b000);
+    wire [2:0] mode = {SWC, SWB, SWA};
+    wire [3:0] op   = {IR7, IR6, IR5, IR4};
 
-    localparam OP_ADD  = 4'b0001;
-    localparam OP_SUB  = 4'b0010;
-    localparam OP_AND  = 4'b0011;
-    localparam OP_INC  = 4'b0100;
-    localparam OP_LD   = 4'b0101;
-    localparam OP_ST   = 4'b0110;
-    localparam OP_JC   = 4'b0111;
-    localparam OP_JZ   = 4'b1000;
-    localparam OP_JMP  = 4'b1001;
-    localparam OP_OUT  = 4'b1010;
-    localparam OP_IRET = 4'b1011;
-    localparam OP_DI   = 4'b1100;
-    localparam OP_EI   = 4'b1101;
-    localparam OP_STP  = 4'b1110;
+    reg        STO;
+    reg        SSTO;
+
+    localparam RUN    = 3'b000;
+    localparam WR_REG = 3'b100;
+    localparam RD_REG = 3'b011;
+    localparam RD_MEM = 3'b010;
+    localparam WR_MEM = 3'b001;
+
+    localparam ADD = 4'b0001, SUB = 4'b0010, AND_ = 4'b0011, INC = 4'b0100;
+    localparam LD  = 4'b0101, ST  = 4'b0110, JC  = 4'b0111, JZ  = 4'b1000;
+    localparam JMP = 4'b1001, STP = 4'b1110;
+
+    wire clr_reg = ((mode == WR_REG) | (mode == RD_REG)) & STO & W2;
+
+    always @(negedge T3 or negedge CLR_n) begin
+        if (!CLR_n)
+            STO <= 1'b0;
+        else if (clr_reg)
+            STO <= 1'b0;
+        else if (SSTO)
+            STO <= 1'b1;
+    end
 
     always @(*) begin
+        LDZ    = 1'b0;
+        LDC    = 1'b0;
+        CIN    = 1'b0;
+        S0     = 1'b0;
+        S1     = 1'b0;
+        S2     = 1'b0;
+        S3     = 1'b0;
+        M      = 1'b0;
+        ABUS   = 1'b0;
         DRW    = 1'b0;
         PCINC  = 1'b0;
         LPC    = 1'b0;
@@ -78,15 +97,6 @@ module hardwired_ctrl (
         MEMW   = 1'b0;
         STOP   = 1'b0;
         LIR    = 1'b0;
-        LDZ    = 1'b0;
-        LDC    = 1'b0;
-        CIN    = 1'b0;
-        S0     = 1'b0;
-        S1     = 1'b0;
-        S2     = 1'b0;
-        S3     = 1'b0;
-        M      = 1'b0;
-        ABUS   = 1'b0;
         SBUS   = 1'b0;
         MBUS   = 1'b0;
         SHORT  = 1'b0;
@@ -95,140 +105,115 @@ module hardwired_ctrl (
         SEL1   = 1'b0;
         SEL2   = 1'b0;
         SEL3   = 1'b0;
+        SSTO   = 1'b0;
 
-        if (instr_mode) begin
+        case (mode)
+        RUN: begin
             if (W1) begin
-                // W1 fetch: LIR/PCINC only. Do NOT assert SHORT here — on TEC
-                // timing gen, SHORT@W1 skips W2 and stays on W1.
-                LIR = 1'b1;
-                if (T3)
-                    PCINC = 1'b1;
-            end
-
-            if (W2) begin
-                case (ir_op)
-                    OP_ADD: begin
-                        S3 = 1'b1; S2 = 1'b0; S1 = 1'b0; S0 = 1'b1;
-                        CIN = 1'b1; ABUS = 1'b1; DRW = 1'b1;
-                        LDZ = 1'b1; LDC = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_SUB: begin
-                        S3 = 1'b0; S2 = 1'b1; S1 = 1'b1; S0 = 1'b0;
-                        ABUS = 1'b1; DRW = 1'b1;
-                        LDZ = 1'b1; LDC = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_AND: begin
-                        M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b1;
-                        ABUS = 1'b1; DRW = 1'b1; LDZ = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_INC: begin
-                        S3 = 1'b0; S2 = 1'b0; S1 = 1'b0; S0 = 1'b0;
-                        ABUS = 1'b1; DRW = 1'b1;
-                        LDZ = 1'b1; LDC = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_LD: begin
-                        M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
-                        ABUS = 1'b1; LAR = 1'b1; LONG = 1'b1; SELCTL = 1'b1;
-                    end
-                    OP_ST: begin
-                        M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
-                        ABUS = 1'b1; LAR = 1'b1; LONG = 1'b1; SELCTL = 1'b1;
-                    end
-                    OP_JC: begin
-                        if (C) PCADD = 1'b1;
-                        SHORT = 1'b1;
-                    end
-                    OP_JZ: begin
-                        if (Z) PCADD = 1'b1;
-                        SHORT = 1'b1;
-                    end
-                    OP_JMP: begin
-                        M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
-                        ABUS = 1'b1; LPC = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_OUT: begin
-                        ABUS = 1'b1; SELCTL = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_IRET: begin
-                        LPC = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_DI: begin
-                        STOP = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_EI: begin
-                        SHORT = 1'b1;
-                    end
-                    OP_STP: begin
-                        STOP = 1'b1; SHORT = 1'b1;
-                    end
-                    default: ;
+                LIR   = 1'b1;
+                PCINC = 1'b1;
+            end else if (W2) begin
+                case (op)
+                ADD: begin
+                    M = 1'b0; S3 = 1'b1; S2 = 1'b0; S1 = 1'b0; S0 = 1'b1; CIN = 1'b1;
+                    ABUS = 1'b1; DRW = 1'b1; LDZ = 1'b1; LDC = 1'b1;
+                end
+                SUB: begin
+                    M = 1'b0; S3 = 1'b0; S2 = 1'b1; S1 = 1'b1; S0 = 1'b0; CIN = 1'b0;
+                    ABUS = 1'b1; DRW = 1'b1; LDZ = 1'b1; LDC = 1'b1;
+                end
+                AND_: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b1;
+                    ABUS = 1'b1; DRW = 1'b1; LDZ = 1'b1;
+                end
+                INC: begin
+                    M = 1'b0; S3 = 1'b0; S2 = 1'b0; S1 = 1'b0; S0 = 1'b0; CIN = 1'b0;
+                    ABUS = 1'b1; DRW = 1'b1; LDZ = 1'b1; LDC = 1'b1;
+                end
+                LD: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
+                    ABUS = 1'b1; LAR = 1'b1; LONG = 1'b1;
+                end
+                ST: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
+                    ABUS = 1'b1; LAR = 1'b1; LONG = 1'b1;
+                end
+                JC: if (C) PCADD = 1'b1;
+                JZ: if (Z) PCADD = 1'b1;
+                JMP: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
+                    ABUS = 1'b1; LPC = 1'b1;
+                end
+                STP: STOP = 1'b1;
+                default: ;
                 endcase
-            end
-
-            if (W3) begin
-                case (ir_op)
-                    OP_LD: begin
-                        DRW = 1'b1; MBUS = 1'b1; SHORT = 1'b1;
-                    end
-                    OP_ST: begin
-                        M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
-                        ABUS = 1'b1; MEMW = 1'b1; SHORT = 1'b1;
-                    end
-                    default: ;
-                endcase
-            end
-        end else begin
-            case (sw)
-                3'b100: begin
-                    if (W1) begin
-                        SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
-                        if (!STO) begin
-                            SEL1 = 1'b1; SEL0 = 1'b1;
-                        end else begin
-                            SEL3 = 1'b1; SEL0 = 1'b1;
-                        end
-                    end
-                    if (W2) begin
-                        SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
-                        if (!STO) begin
-                            SEL2 = 1'b1;
-                        end else begin
-                            SEL3 = 1'b1; SEL2 = 1'b1; SEL1 = 1'b1;
-                        end
-                    end
+            end else if (W3) begin
+                case (op)
+                LD: begin
+                    MBUS = 1'b1; DRW = 1'b1;
                 end
-                3'b011: begin
-                    if (W1) begin
-                        SEL0 = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
-                    end
-                    if (W2) begin
-                        SEL3 = 1'b1; SEL1 = 1'b1; SEL0 = 1'b1;
-                        SELCTL = 1'b1; STOP = 1'b1;
-                    end
-                end
-                3'b010: begin
-                    SHORT = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
-                    if (W1) begin
-                        if (!STO) begin
-                            SBUS = 1'b1; LAR = 1'b1;
-                        end else begin
-                            MBUS = 1'b1; ARINC = 1'b1;
-                        end
-                    end
-                end
-                3'b001: begin
-                    SHORT = 1'b1; SELCTL = 1'b1; STOP = 1'b1;
-                    if (W1) begin
-                        if (!STO) begin
-                            SBUS = 1'b1; LAR = 1'b1;
-                        end else begin
-                            SBUS = 1'b1; MEMW = 1'b1; ARINC = 1'b1;
-                        end
-                    end
+                ST: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
+                    ABUS = 1'b1; MEMW = 1'b1;
                 end
                 default: ;
-            endcase
+                endcase
+            end
         end
+
+        WR_REG: begin
+            if (W1) begin
+                SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
+                if (!STO) begin
+                    SEL3 = 1'b0; SEL2 = 1'b0; SEL1 = 1'b1; SEL0 = 1'b1;
+                end else begin
+                    SEL3 = 1'b1; SEL2 = 1'b0; SEL1 = 1'b0; SEL0 = 1'b1;
+                end
+            end else if (W2) begin
+                SBUS = 1'b1; SELCTL = 1'b1; DRW = 1'b1; STOP = 1'b1;
+                if (!STO) begin
+                    SEL3 = 1'b0; SEL2 = 1'b1; SEL1 = 1'b0; SEL0 = 1'b0;
+                    SSTO = 1'b1;
+                end else begin
+                    SEL3 = 1'b1; SEL2 = 1'b1; SEL1 = 1'b1; SEL0 = 1'b0;
+                end
+            end
+        end
+
+        RD_REG: begin
+            if (W1) begin
+                SELCTL = 1'b1; STOP = 1'b1;
+                SEL3 = 1'b0; SEL2 = 1'b0; SEL1 = 1'b0; SEL0 = 1'b1;
+            end else if (W2) begin
+                SELCTL = 1'b1; STOP = 1'b1;
+                SEL3 = 1'b1; SEL2 = 1'b0; SEL1 = 1'b1; SEL0 = 1'b1;
+            end
+        end
+
+        RD_MEM: begin
+            if (W1) begin
+                SELCTL = 1'b1; STOP = 1'b1; SHORT = 1'b1;
+                if (!STO) begin
+                    SBUS = 1'b1; LAR = 1'b1; SSTO = 1'b1;
+                end else begin
+                    MBUS = 1'b1; ARINC = 1'b1;
+                end
+            end
+        end
+
+        WR_MEM: begin
+            if (W1) begin
+                SELCTL = 1'b1; STOP = 1'b1; SHORT = 1'b1;
+                if (!STO) begin
+                    SBUS = 1'b1; LAR = 1'b1; SSTO = 1'b1;
+                end else begin
+                    SBUS = 1'b1; MEMW = 1'b1; ARINC = 1'b1;
+                end
+            end
+        end
+
+        default: ;
+        endcase
     end
 
 endmodule

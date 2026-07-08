@@ -13,6 +13,7 @@ NET "IR7"   LOC = E12;
 NET "W1"    LOC = F9;
 NET "W2"    LOC = K12;
 NET "W3"    LOC = N5;
+NET "QD"    LOC = J16;
 NET "C"     LOC = B5;
 NET "Z"     LOC = A5;
 

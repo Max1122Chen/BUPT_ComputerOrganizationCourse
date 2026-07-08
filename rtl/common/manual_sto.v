@@ -37,7 +37,7 @@ module manual_sto (
         end else begin
             if (sw != sw_q)
                 sto_r <= 1'b0;
-            else if (mem_sto_en && w1_q && !W1)
+            else if (mem_sto_en && w1_q && !W1 && !sto_r)
                 sto_r <= ~sto_r;
             else if (reg_sto_en && w2_q && !W2)
                 sto_r <= ~sto_r;

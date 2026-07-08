@@ -1,15 +1,16 @@
-// Control-vector testbench for hardwired_ctrl (SIM-F01 / CTL-F01)
+// Control-vector testbench for hardwired_ctrl (partner baseline replica)
 
 `timescale 1ns / 1ps
 
 module tb_ctrl;
 
+    reg        CLR_n;
     reg        T3;
+    reg        QD;
     reg        SWA, SWB, SWC;
     reg [7:0]  ir;
     reg        W1, W2, W3;
     reg        C, Z;
-    reg        STO;
 
     wire       DRW, PCINC, LPC, LAR, PCADD, ARINC, SELCTL, MEMW, STOP, LIR;
     wire       LDZ, LDC, CIN;
@@ -20,10 +21,11 @@ module tb_ctrl;
     integer    errors;
 
     hardwired_ctrl dut (
-        .T3(T3), .SWA(SWA), .SWB(SWB), .SWC(SWC),
+        .CLR_n(CLR_n),
+        .T3(T3), .QD(QD), .SWA(SWA), .SWB(SWB), .SWC(SWC),
         .IR4(ir[4]), .IR5(ir[5]), .IR6(ir[6]), .IR7(ir[7]),
         .W1(W1), .W2(W2), .W3(W3),
-        .C(C), .Z(Z), .STO(STO),
+        .C(C), .Z(Z),
         .DRW(DRW), .PCINC(PCINC), .LPC(LPC), .LAR(LAR),
         .PCADD(PCADD), .ARINC(ARINC), .SELCTL(SELCTL),
         .MEMW(MEMW), .STOP(STOP), .LIR(LIR),
@@ -36,6 +38,13 @@ module tb_ctrl;
 
     task clear_w;
         begin W1 = 0; W2 = 0; W3 = 0; end
+    endtask
+
+    task step_t3;
+        begin
+            T3 = 1; #1;
+            T3 = 0; #1;
+        end
     endtask
 
     task expect1;
@@ -52,20 +61,20 @@ module tb_ctrl;
 
     initial begin
         errors = 0;
-        T3 = 0; SWA = 0; SWB = 0; SWC = 0;
-        ir = 8'h00; C = 0; Z = 0; STO = 0;
+        CLR_n = 1;
+        T3 = 0; QD = 0; SWA = 0; SWB = 0; SWC = 0;
+        ir = 8'h00; C = 0; Z = 0;
         clear_w();
+        #1; CLR_n = 0;
+        #1; CLR_n = 1;
 
-        // --- W1 fetch: ADD opcode irrelevant for LIR ---
+        // --- W1 fetch (partner: PCINC with W1, no T3 gate) ---
         ir = 8'h11;
-        W1 = 1; T3 = 0;
-        #1;
+        W1 = 1; #1;
         expect1(LIR, 1'b1, "fetch LIR");
-        expect1(PCINC, 1'b0, "fetch PCINC before T3");
-        T3 = 1; #1;
-        expect1(PCINC, 1'b1, "fetch PCINC at T3");
-        expect1(SHORT, 1'b0, "fetch W1 must not assert SHORT");
-        clear_w(); T3 = 0;
+        expect1(PCINC, 1'b1, "fetch PCINC");
+        expect1(SHORT, 1'b0, "fetch no SHORT");
+        clear_w();
 
         // --- W2 ADD ---
         ir = 8'h11;
@@ -75,7 +84,8 @@ module tb_ctrl;
         expect1(CIN, 1'b1, "ADD CIN");
         expect1(S3, 1'b1, "ADD S3");
         expect1(S0, 1'b1, "ADD S0");
-        expect1(SELCTL, 1'b1, "ADD SELCTL");
+        expect1(SELCTL, 1'b0, "ADD no SELCTL");
+        expect1(SHORT, 1'b0, "ADD no SHORT");
         clear_w();
 
         // --- W2 SUB ---
@@ -96,7 +106,7 @@ module tb_ctrl;
         W3 = 1; #1;
         expect1(DRW, 1'b1, "LD W3 DRW");
         expect1(MBUS, 1'b1, "LD W3 MBUS");
-        expect1(SHORT, 1'b1, "LD W3 SHORT");
+        expect1(SHORT, 1'b0, "LD W3 no SHORT");
         clear_w();
 
         // --- W2 ST + W3 ---
@@ -106,7 +116,7 @@ module tb_ctrl;
         clear_w();
         W3 = 1; #1;
         expect1(MEMW, 1'b1, "ST W3 MEMW");
-        expect1(SHORT, 1'b1, "ST W3 SHORT");
+        expect1(SHORT, 1'b0, "ST W3 no SHORT");
         clear_w();
 
         // --- JC taken / not taken ---
@@ -146,19 +156,6 @@ module tb_ctrl;
         expect1(LDC, 1'b1, "INC LDC");
         clear_w();
 
-        // --- OUT / EI / IRET ---
-        ir = 8'hA2; W2 = 1; #1;
-        expect1(ABUS, 1'b1, "OUT ABUS");
-        clear_w();
-
-        ir = 8'hD0; W2 = 1; #1;
-        expect1(SHORT, 1'b1, "EI SHORT");
-        clear_w();
-
-        ir = 8'hB0; W2 = 1; #1;
-        expect1(LPC, 1'b1, "IRET LPC");
-        clear_w();
-
         // --- manual read reg SW=011 ---
         SWC = 0; SWB = 1; SWA = 1;
         W1 = 1; #1;
@@ -178,8 +175,8 @@ module tb_ctrl;
         SWC = 0; SWB = 0; SWA = 0;
         clear_w();
 
-        // --- manual write reg SW=100 ---
-        SWC = 1; SWB = 0; SWA = 0; STO = 0;
+        // --- manual write reg SW=100 (partner STO on T3) ---
+        SWC = 1; SWB = 0; SWA = 0;
         W1 = 1; #1;
         expect1(SBUS, 1'b1, "wrreg sto0 W1 SBUS");
         expect1(DRW, 1'b1, "wrreg sto0 W1 DRW");
@@ -191,12 +188,9 @@ module tb_ctrl;
         expect1(SBUS, 1'b1, "wrreg sto0 W2 SBUS");
         expect1(DRW, 1'b1, "wrreg sto0 W2 DRW");
         expect1(SEL2, 1'b1, "wrreg sto0 W2 SEL2");
-        expect1(SHORT, 1'b0, "wrreg W2 no SHORT");
+        step_t3();
         clear_w();
-        STO = 1;
         W1 = 1; #1;
-        expect1(SBUS, 1'b1, "wrreg sto1 W1 SBUS");
-        expect1(DRW, 1'b1, "wrreg sto1 W1 DRW");
         expect1(SEL3, 1'b1, "wrreg sto1 W1 SEL3");
         expect1(SEL0, 1'b1, "wrreg sto1 W1 SEL0");
         clear_w();
@@ -206,15 +200,31 @@ module tb_ctrl;
         expect1(SEL3, 1'b1, "wrreg sto1 W2 SEL3");
         expect1(SEL2, 1'b1, "wrreg sto1 W2 SEL2");
         expect1(SEL1, 1'b1, "wrreg sto1 W2 SEL1");
+        step_t3();
+        clear_w();
+
+        // After final W2+T3, STO clears; next W1 restarts at R0.
+        W1 = 1; #1;
+        expect1(SEL1, 1'b1, "wrreg restart W1 SEL1");
+        expect1(SEL0, 1'b1, "wrreg restart W1 SEL0");
+        expect1(DRW, 1'b1, "wrreg restart W1 DRW");
         SWC = 0; SWB = 0; SWA = 0;
         clear_w();
 
         // --- manual read mem SW=010 ---
-        SWC = 0; SWB = 1; SWA = 0; STO = 0;
+        SWC = 0; SWB = 1; SWA = 0;
         W1 = 1; #1;
-        expect1(SBUS, 1'b1, "rdmem SBUS");
-        expect1(LAR, 1'b1, "rdmem LAR");
+        expect1(SBUS, 1'b1, "rdmem addr SBUS");
+        expect1(LAR, 1'b1, "rdmem addr LAR");
         expect1(SHORT, 1'b1, "rdmem SHORT");
+        T3 = 1; #1;
+        expect1(LAR, 1'b1, "rdmem LAR held at T3 high");
+        expect1(MBUS, 1'b0, "rdmem no MBUS at T3 high");
+        step_t3();
+        clear_w();
+        W1 = 1; #1;
+        expect1(MBUS, 1'b1, "rdmem data MBUS");
+        expect1(ARINC, 1'b1, "rdmem data ARINC");
         SWC = 0; SWB = 0; SWA = 0;
         clear_w();
 
