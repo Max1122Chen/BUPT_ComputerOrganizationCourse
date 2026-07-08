@@ -3,9 +3,9 @@
 ## Meta
 - **ID:** PL-F01
 - **Type:** Feature
-- **Status:** Review
+- **Status:** In Progress
 - **Owner:** maintainer
-- **Last updated:** 2026-07-06
+- **Last updated:** 2026-07-08
 - **Related:**
   - [PL-F01_IMPLEMENTATION](./PL-F01_IMPLEMENTATION.md)
   - [CTL-F01_DESIGN](./CTL-F01_DESIGN.md)
@@ -13,12 +13,12 @@
 
 ## TL;DR
 
-在 CTL-F01 顺序控制器 **语义不变** 前提下，增加流水寄存器与冒险单元，实现 IF/EX/MEM 重叠；解决 load-use 与控制冒险；输出性能对比文档。
+在 CTL-F01 顺序控制器 **语义不变** 前提下，增加流水寄存器与冒险单元，实现 IF/EX/MEM 重叠；解决 load-use 与 RAW、控制冒险；手动 SW 模式 **bypass 流水**。
 
 ## Scope
 
-- **In:** `rtl/controller/hardwired_ctrl_pipe.v`（或 `PIPELINE` 参数化）、`hazard_unit.v`、`pipe_regs.v`
-- **Out:** 修改实验箱数据通路、拓展中断专题
+- **In:** `hardwired_ctrl_pipe.v`、`pipe_regs.v`、`hazard_unit.v`、`hardwired_ctrl_core.v`（S02 抽取）
+- **Out:** 修改实验箱数据通路、拓展中断专题（OUT/DI/EI/IRET，TD-004）
 
 ## Reader quick start
 
@@ -30,73 +30,100 @@
 
 ## 1) 背景与目标
 
-课设进阶要求将顺序控制器流水化，并处理冒险、量化性能。
+课设进阶：顺序 → 流水，处理数据/控制冒险，量化性能。
 
-**前置条件：** `CTL-F01` Done（黄金向量基线）。
-
----
-
-## 2) 现状（计划起点）
-
-- 顺序控制器 `hardwired_ctrl` 已验证
-- 时序发生器仍产生 W1–W3；流水控制器需与之协调
+**前置：** CTL-F01 + HW-F01 基础上板 Done。
 
 ---
 
-## 3) 方案
+## 2) 已锁定决策（2026-07-08）
 
-### 3.1 结构
+| # | 决策 | 结论 |
+|---|------|------|
+| D1 | 阶段模型 | **IF≈W1 / EX≈W2 / MEM≈W3**（ADR-02） |
+| D2 | 手动 SW | **`mode≠RUN` 纯顺序 bypass**，与流水线无关 |
+| D3 | 模块拆分 | 独立 `*_pipe` / `pipe_regs` / `hazard_unit` / `core` |
+| D4 | 顺序版 | **保留** `hardwired_ctrl.v` 作回归基线 |
+| D5 | 板上顶层 | S09 前 `top` 仍用顺序版；S09 切 `hardwired_ctrl_pipe` |
+| D6 | Stall | **冻结 IF/EX 寄存器**；不用 `STOP` 停时序 |
+| D7 | 流水锁存沿 | **W 相位内 `negedge T3`** |
+| D8 | 控制字 | 每拍按当前 W 相位 mux 单路 core 输出 |
+| D9 | EX/MEM 寿命 | 短指令 **W2 末** 失效；LD/ST **W3 末** 失效 |
+| D10 | 数据冒险 | **双模式**：仿真精确 Rd/Rs；**上板保守 opcode 级**（见 §3.4） |
+| D11 | 控制冒险 | **JC/JZ/JMP taken → flush IF/EX**（W2 判定） |
+| D12 | 指令范围 | 10 条 RUN（同 CTL-F01）；不含 TD-004 四条 |
+| D13 | IR 接口 | **板上仅 IR4–7**（图 47）；IR3–0 在数据通路内部，不送 FPGA |
+| D14 | Hazard 参数 | `HAZARD_FINE_GRAIN=0` 上板默认；仿真 `=1` |
+
+---
+
+## 3) 结构
 
 ```text
 hardwired_ctrl_pipe.v
-  ├── pipe_regs.v          # IF/EX/MEM 流水寄存器（IR, 控制字, 有效位）
-  ├── hazard_unit.v        # RAW, load-use, branch
-  └── hardwired_ctrl_core  # 复用 CTL-F01 组合译码逻辑
+  ├── pipe_regs.v          # IF/EX + EX/MEM；EX/MEM 跨 W2(/W3)
+  ├── hazard_unit.v        # stall / branch flush
+  └── hardwired_ctrl_core  # CTL-F01 组合译码（顺序+流水复用）
+
+hardwired_ctrl.v           # 顺序包装（上板基线，含 STO）
 ```
 
-### 3.2 流水寄存器
+### 3.1 RUN 模式数据通路
 
-| 寄存器 | 锁存内容 | 更新时机 |
-|--------|----------|----------|
-| IF/EX | IR, Rd, Rs, 指令有效 | W1 末 / 时序 T3 |
-| EX/MEM | 访存控制、写回信息 | W2 末 |
-| MEM/WB | （控制字输出级） | W3 末 |
+```text
+W1: core(w1) → LIR, PCINC（stall 时 PCINC=0）
+    negedge T3: IF/EX ← fetch；若 EX/MEM 空闲则 EX/MEM ← IF/EX
+W2: core(w2, exmem.op) → EX 控制；SHORT=1（非访存）
+    negedge T3: 短指令清除 exmem_valid；分支 taken → flush IF/EX
+W3: core(w3, exmem.op) → MEM（仅 LD/ST）
+    negedge T3: 清除 exmem_valid
+```
 
-（具体时钟沿与 `T3` 输入对齐，在 S03 仿真确定。）
+### 3.2 冒险（仿真：精确模式）
 
-### 3.3 停顿与冲刷
+| 冒险 | 检测（`HAZARD_FINE_GRAIN=1`） | 动作 |
+|------|-------------------------------|------|
+| Load-use | EX/MEM=LD 且 Rd 命中 IF/EX 源寄存器 | stall@W1 |
+| RAW (RR) | EX/MEM 写 Rd，IF/EX RR 读 Rs | stall@W1 |
+| 控制 | EX 级 JC/JZ/JMP taken | flush IF/EX |
 
-| 冒险 | 检测 | 动作 |
+### 3.3 平台约束与板上保守模式（图 47）
+
+TEC-PLUS 给控制器的指令输入**只有 IR4–IR7**（操作码）。Rd/Rs（IR3–0）由板内数据通路使用，与顺序硬布线设计一致。
+
+**推论：** FPGA 无法做寄存器级 hazard 比较；**不飞线 IR0–3**。
+
+`hazard_unit` 参数 `HAZARD_FINE_GRAIN`（`hardwired_ctrl_pipe` 默认 **0**）：
+
+| 模式 | 条件 | 行为 |
 |------|------|------|
-| Load-use | EX 为 LD，EX.Rd == IF 源寄存器 | 插入 1 bubble，冻结 IF/EX |
-| RAW（RR） | EX 写寄存器与 IF 读冲突 | 1 bubble（若板级无旁路） |
-| 控制 | EX 判定 JC/JZ/JMP  taken | flush IF；`PCINC`/`LPC`/`PCADD` 按顺序语义 |
+| **板上（0）** | EX/MEM=LD 且 IF/EX 有有效指令 | 一律 stall（load-use 保守） |
+| **板上（0）** | EX/MEM 写寄存器 且 IF/EX 为 ADD/SUB/AND | 一律 stall（RAW 保守） |
+| **仿真（1）** | 有完整 IR7–0 | 按 Rd/Rs 精确比较 |
 
-### 3.4 与 SHORT/LONG 交互
+板上可能多停几拍，但**保证正确**；性能报告用仿真精确模式测算 CPI，板上演示正确性。
 
-- LD/ST 占据 EX+MEM 两级；`LONG` 在 EX 级断言
-- 短指令 MEM 级为空泡，不重复 W2 操作
+`top` 上板时：`HAZARD_FINE_GRAIN=0`，`IR0–IR3` 接 `1'b0`（或省略端口由顶层 tie-off）。
 
-### 3.5 性能计数（仿真 + 可选板上）
+### 3.4 性能计数（S08）
 
-- `cnt_cycles`, `cnt_stall`, `cnt_branch_flush`
-- 用于 `PL-F01_PERFORMANCE.md`
+`cnt_cycles`, `cnt_stall`, `cnt_branch_flush` → `PL-F01_PERFORMANCE.md`
 
 ---
 
 ## 4) 验收标准
 
-- [ ] 顺序版测试程序在流水版上结果一致
-- [ ] load-use 用例可观察 stall
-- [ ] 分支用例可观察 flush
-- [ ] 性能文档含 CPI / Fmax 对比
-- [ ] 板上无吞指令回归
+- [x] `tb_ctrl` 顺序回归 PASS（core 抽取后）
+- [x] `tb_pipe` 流水 fetch/EX/MEM、stall、手动 bypass PASS
+- [ ] 用例 C 程序级结果与顺序版一致
+- [ ] 板上回归（S09）
+- [ ] `PL-F01_PERFORMANCE.md`
 
 ---
 
 ## 7) Status note
 
-**Review** — 依赖 CTL-F01 完成后启动；审批后可先写 S01 架构骨架。
+**In Progress** — S01–S07 RTL + `tb_pipe` 初版 PASS；待 S08 性能文档、S09 上板。
 
 ---
 
@@ -105,3 +132,5 @@ hardwired_ctrl_pipe.v
 | 日期 | 说明 |
 |------|------|
 | 2026-07-06 | 初稿 |
+| 2026-07-08 | 决策锁定；实现 pipe_regs/hazard/pipe；抽取 core |
+| 2026-07-08 | 图 47 仅 IR4–7：板上保守 hazard（`HAZARD_FINE_GRAIN=0`） |

@@ -1,6 +1,6 @@
 # Bootstrap Digest (read in under 2 min)
 
-Last updated: 2026-07-06  
+Last updated: 2026-07-08  
 Purpose: **one-page** context for humans and AI when starting or recovering a session.  
 **Doc trust:** `.cursor/rules/docs-trust-tiers.mdc` — do not treat course PDF as backlog; use [ACTIVE_WORK.md](./ACTIVE_WORK.md).
 
@@ -8,7 +8,9 @@ Purpose: **one-page** context for humans and AI when starting or recovering a se
 
 ## Project in one line
 
-**BUPT 计组课设** — 题目 A 硬布线控制器，目标 **进阶（流水线）**；工程纪律对标 minEngine，验证以 RTL + 仿真/综合为准。
+**BUPT 计组课设** — 题目 A 硬布线控制器；**基础+上板 Done**；当前 **PL-F01 流水线**；验证以 RTL + 仿真/综合为准。
+
+**Deferred（不做 backlog）：** OUT/DI/EI/IRET、中断拓展（TD-004/006）。
 
 ---
 

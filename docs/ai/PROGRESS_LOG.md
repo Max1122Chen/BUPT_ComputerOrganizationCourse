@@ -70,4 +70,31 @@
 - **Validation done:** 板级用例 A/C PASS；`sim/run_tb.ps1` PASS
 - **Next step:** PL-F01 流水线，或补 OUT/DI/EI/IRET
 
+### 2026-07-08 — PL-F01 流水线 S01–S07 (RTL + sim)
+
+- **Goal:** 决策锁定后实现流水控制器骨架与冒险处理
+- **Main changes:**
+  - 抽取 `hardwired_ctrl_core.v`；顺序 `hardwired_ctrl.v` 回归不变
+  - 新增 `pipe_regs.v`、`hazard_unit.v`、`hardwired_ctrl_pipe.v`
+  - `sim/tb_pipe.v` + `run_tb.ps1` 扩展
+- **Validation done:** `tb_ctrl` + `tb_pipe` + `tb_manual_sto` PASS
+- **Next step:** PL-F01-S08 性能文档；S09 上板
+
+### 2026-07-08 — 板上 hazard 策略对齐图 47（PL-F01）
+
+- **Goal:** 图 47 无 IR0–3 时流水 hazard 如何落地
+- **Main changes:**
+  - `hazard_unit` 双模式：`HAZARD_FINE_GRAIN=0` 板上保守 stall；`=1` 仿真精确 Rd/Rs
+  - `hardwired_ctrl_pipe` 默认 `HAZARD_FINE_GRAIN=0`；`tb_pipe` 显式 `=1`
+  - 更新 PL-F01_DESIGN §3.3、ADR-02、TD-008 Done
+- **Validation done:** `run_tb.ps1` PASS
+- **Next step:** S08 性能文档（仿真精确 CPI + 板上保守说明）；S09 `top` 切流水版
+
+### 2026-07-08 — W3 引脚修正 F4（老师确认）
+
+- **Goal:** UCF 与板内 W3 走线一致，取消 W3→N5 飞线
+- **Main changes:** `constraints/tecplus.ucf`、`ise/tecplus.ucf`：`W3` **N5 → F4**；BOARD_TEST §3.1 仅保留 T3 飞线
+- **Validation done:** 待 ISE 重综合烧录 + 用例 C（**拔掉 W3 飞线**）
+- **Next step:** 板上验证 LD/ST 第三拍
+
 <!-- 新条目请用 templates/progress-log-entry.template.md 格式追加在上方 -->

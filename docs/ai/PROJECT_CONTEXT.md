@@ -37,7 +37,7 @@ Purpose: **stable snapshot** for humans and AI. Details and churn live in design
 
 拨码：**硬连线模式**。
 
-**上板飞线（必需）：** 时序发生器 **T3 → FPGA C10**，**W3 → FPGA N5**（面板 W3 灯 ≠ FPGA 输入；见 [HW-F01_BOARD_TEST §3.1](./designs/HW-F01_BOARD_TEST.md)）。
+**上板飞线（必需）：** 时序发生器 **T3 → FPGA C10**。W1/W2/W3 板内已接（W3=**F4**）。见 [HW-F01_BOARD_TEST §3.1](./designs/HW-F01_BOARD_TEST.md)。
 
 ---
 
@@ -85,7 +85,7 @@ docs/course/   课设 PDF/图片
 | **基础 RTL** | CTL-F01 | **Done** |
 | **仿真** | SIM-F01 | **Done**（核心 PASS） |
 | **上板（基础）** | HW-F01 | **Done**（2026-07-08） |
-| 进阶 | PL-F01 | Planned ← 下一步 |
+| 进阶 | PL-F01 | **In Progress**（设计） ← 当前 |
 
 详见 [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)、[ACTIVE_WORK](./ACTIVE_WORK.md)。
 

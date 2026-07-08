@@ -1,6 +1,6 @@
 # Feature Registry
 
-Last updated: 2026-07-06  
+Last updated: 2026-07-08  
 Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 
 ---
@@ -11,9 +11,9 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 |------------|-------|--------|-------|----------------|
 | `WF-F01` | 工程纪律、文档模板、Cursor 规则、verify 脚本 | **Done** | — | [DOC_GOVERNANCE](./templates/DOC_GOVERNANCE.md) |
 | `CTL-F01` | 顺序硬布线控制器（基础） | **Done** | — | [DESIGN](./designs/CTL-F01_DESIGN.md) · `rtl/controller/hardwired_ctrl.v` |
-| `SIM-F01` | 仿真 Testbench 与控制字回归 | **In Progress** | — | [DESIGN](./designs/SIM-F01_DESIGN.md) · `sim/tb_ctrl.v`（核心 PASS） |
-| `HW-F01` | UCF、ISE 综合、上板 | **Planned** | — | [DESIGN](./designs/HW-F01_DESIGN.md) · **下一主线** |
-| `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **Planned** | — | [DESIGN](./designs/PL-F01_DESIGN.md) |
+| `SIM-F01` | 仿真 Testbench 与控制字回归 | **Done** | — | `tb_ctrl` + `tb_pipe` PASS |
+| `HW-F01` | UCF、ISE 综合、上板（基础） | **Done** | — | [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) |
+| `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **In Progress** | — | [DESIGN](./designs/PL-F01_DESIGN.md) · S08/S09 待完成 |
 
 **总纲：** [REQUIREMENTS_ANALYSIS](./designs/REQUIREMENTS_ANALYSIS.md)（Approved）· [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)
 

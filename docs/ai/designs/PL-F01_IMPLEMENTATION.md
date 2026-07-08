@@ -2,14 +2,14 @@
 
 ## Meta
 - **ID:** PL-F01
-- **Status:** Review
+- **Status:** In Progress
 - **Owner:** maintainer
-- **Last updated:** 2026-07-06
+- **Last updated:** 2026-07-08
 - **Related:** [PL-F01_DESIGN](./PL-F01_DESIGN.md)
 
 ## TL;DR
 
-**9 个切片**；**硬依赖 CTL-F01 Done**；末片交付性能报告。
+**9 个切片**；S01–S07 RTL + `tb_pipe` 初版完成；待 S08 性能报告、S09 上板。
 
 ---
 
@@ -17,65 +17,45 @@
 
 | Slice ID | 内容 | 状态 | 验证 |
 |----------|------|------|------|
-| PL-F01-S01 | 流水架构骨架 + `pipe_regs` | Planned | 编译 |
-| PL-F01-S02 | 封装 `hardwired_ctrl_core` 复用顺序译码 | Planned | 与 CTL 向量对比 |
-| PL-F01-S03 | IF 级：LIR/PCINC 时序 + IF/EX 锁存 | Planned | sim: pipe_fetch |
-| PL-F01-S04 | EX 级：RR/分支/JMP 重叠 | Planned | sim: pipe_ex |
-| PL-F01-S05 | MEM 级：LD/ST 第三拍 | Planned | sim: pipe_mem |
-| PL-F01-S06 | 数据冒险：load-use + RAW stall | Planned | sim: hazard_data |
-| PL-F01-S07 | 控制冒险：branch flush | Planned | sim: hazard_ctrl |
+| PL-F01-S01 | 流水架构骨架 + `pipe_regs` | **Done** | 编译 |
+| PL-F01-S02 | 封装 `hardwired_ctrl_core` 复用顺序译码 | **Done** | `tb_ctrl` PASS |
+| PL-F01-S03 | IF 级：LIR/PCINC + IF/EX 锁存 | **Done** | `tb_pipe` fetch |
+| PL-F01-S04 | EX 级：RR/分支/JMP 重叠 | **Done** | `tb_pipe` EX |
+| PL-F01-S05 | MEM 级：LD/ST 第三拍 | **Done** | `tb_pipe` MEM |
+| PL-F01-S06 | 数据冒险：load-use + RAW stall | **Done** | `tb_pipe` stall |
+| PL-F01-S07 | 控制冒险：branch flush | **Done** | `tb_pipe` JMP |
 | PL-F01-S08 | 性能采集 + `PL-F01_PERFORMANCE.md` | Planned | 报告评审 |
 | PL-F01-S09 | 上板回归 + 与顺序版对比 | Planned | HW + Progress |
 
 ---
 
-## 2) 切片详情
+## 2) RTL 文件
 
-### PL-F01-S01 — 骨架
-- **Goal:** 新建 `hardwired_ctrl_pipe.v`、`pipe_regs.v`、`hazard_unit.v` 空壳
-- **Touch:** `rtl/controller/*`
-- **Verify:** 编译通过
-
-### PL-F01-S02 — 复用顺序译码
-- **Goal:** 将 CTL-F01 组合逻辑提取为 `hardwired_ctrl_core`（输入：IR,W,C,Z,阶段）
-- **Touch:** 重构 `hardwired_ctrl.v` → core + 包装
-- **Verify:** 顺序模式回归全绿
-
-### PL-F01-S03 — IF 级
-- **Goal:** 流水 IF；LIR/PCINC 次序；ADR-02 落地
-- **Verify:** sim pipe_fetch
-
-### PL-F01-S04 — EX 级
-- **Goal:** 重叠执行 RR/分支；SHORT 断言
-- **Verify:** sim pipe_ex
-
-### PL-F01-S05 — MEM 级
-- **Goal:** LD/ST 长指令第三拍
-- **Verify:** sim pipe_mem
-
-### PL-F01-S06 — 数据冒险
-- **Goal:** `hazard_unit` 检测 load-use；stall 信号
-- **Verify:** 构造 LD;ADD Rd 相邻用例
-
-### PL-F01-S07 — 控制冒险
-- **Goal:** JC/JZ/JMP flush
-- **Verify:** 分支前后指令检查
-
-### PL-F01-S08 — 性能文档
-- **Goal:** `PL-F01_PERFORMANCE.md`：CPI、Fmax、stall 统计
-- **Touch:** `docs/ai/designs/PL-F01_PERFORMANCE.md`
-- **Verify:** 含顺序 vs 流水表
-
-### PL-F01-S09 — 上板
-- **Goal:** 流水版 bit 下载；演示程序；调试日志
-- **Verify:** HW-F01 流程 + Progress
+| 文件 | 作用 |
+|------|------|
+| `rtl/controller/hardwired_ctrl_core.v` | 组合译码（CTL-F01 抽取） |
+| `rtl/controller/hardwired_ctrl.v` | 顺序包装（上板基线） |
+| `rtl/controller/pipe_regs.v` | IF/EX、EX/MEM 流水寄存器 |
+| `rtl/controller/hazard_unit.v` | stall / flush 检测 |
+| `rtl/controller/hardwired_ctrl_pipe.v` | 流水顶层 |
+| `sim/tb_pipe.v` | 流水向量 + 冒险用例 |
 
 ---
 
-## 3) 依赖顺序
+## 3) 验证
+
+```powershell
+.\sim\run_tb.ps1   # tb_ctrl + tb_pipe (HAZARD_FINE_GRAIN=1) + tb_manual_sto
+```
+
+**上板默认：** `hardwired_ctrl_pipe` 参数 `HAZARD_FINE_GRAIN=0`；`IR0–3` 在 `top` tie-off（图 47 无此引脚）。
+
+---
+
+## 4) 依赖顺序
 
 ```text
-CTL-F01 Done → S01 → S02 → S03 → S04 → S05 → S06 → S07 → S08 → S09
+CTL-F01 Done → S01–S07 (Done) → S08 → S09
 ```
 
 ---
@@ -85,3 +65,4 @@ CTL-F01 Done → S01 → S02 → S03 → S04 → S05 → S06 → S07 → S08 →
 | 日期 | 说明 |
 |------|------|
 | 2026-07-06 | 初稿 |
+| 2026-07-08 | S01–S07 实现；tb_pipe PASS |

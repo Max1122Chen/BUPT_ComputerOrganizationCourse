@@ -1,16 +1,17 @@
 # Technical Debt Register
 
-Last updated: 2026-07-06
+Last updated: 2026-07-08
 
 | ID | Title | Module | Severity | Status | Feature / doc | Notes |
 |----|-------|--------|----------|--------|---------------|-------|
 | TD-001 | 平台与 IDE 未最终确认 | WF | **High** | **Done** | ADR-20260706-01 | TEC-PLUS + ISE |
 | TD-002 | verify Stage 2 未接入 ISE | WF | **Medium** | Open | HW-F01-S02/S03 | Stage 0/1 PASS |
 | TD-003 | 无标准课设测试程序与预期结果 | SIM | **Medium** | **Done** | [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) | 用例 A/B 已起草；板上实测待 S04 |
-| TD-004 | OUT/DI/EI/IRET 微操作无流程图 | CTL | **Medium** | Open | CTL-F01-S08 | 上板对标微程序 |
+| TD-004 | OUT/DI/EI/IRET 控制字（拓展/自设计） | CTL | **Low** | **Deferred** | — | 图 45 有编码、图 43 无流程图；属拓展/高阶，需自设计微操作；**不在 PL-F01 范围**；见 TD-006 |
 | TD-005 | STO 信号未接入控制器 | CTL | **Low** | **Done** | `rtl/common/manual_sto.v` | FPGA 内 W1 末拍翻转 STO |
-| TD-006 | 中断拓展专题 | CTL | **Low** | Deferred | — | 不在基础–进阶范围 |
-| TD-007 | tb 未穷举 14 指令 + 全手动 SW | SIM | **Low** | Open | SIM-F01 | 核心用例已 PASS |
+| TD-006 | 中断拓展专题 | CTL | **Low** | **Deferred** | — | 不在基础–进阶范围；与 TD-004 同 defer |
+| TD-007 | tb 未穷举全手动 SW 边角 | SIM | **Low** | Open | SIM-F01 | 核心 + pipe 用例已 PASS |
+| TD-008 | 板上无 IR3–0 精确 hazard | PL | **Low** | **Done** | PL-F01 §3.3 | 保守 stall；`HAZARD_FINE_GRAIN=0` |
 
 ---
 
