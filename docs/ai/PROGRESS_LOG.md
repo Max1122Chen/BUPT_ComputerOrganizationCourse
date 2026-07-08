@@ -60,4 +60,14 @@
 - **Main changes:** ACTIVE_WORK、FEATURE_REGISTRY、EXECUTION_ROADMAP、CTL/SIM 状态 → Done/In Progress
 - **Next step:** 本 commit 批准后 → HW-F01-S02
 
+### 2026-07-08 — 基础上板验收 + FPGA 飞线记录 (HW-F01)
+
+- **Goal:** 手动模式与已实现 RUN 指令集板级验收；记录必需飞线
+- **Main changes:**
+  - STO 在 **T3 下降沿** 更新后，手动读/写寄存器、读/写存储器正常
+  - 时序 **W3 未默认接 FPGA**，飞线 **W3→N5** 后 LD/ST 第三拍正常
+  - 必需飞线：**T3→C10**、**W3→N5**（见 `HW-F01_BOARD_TEST` §3.1）
+- **Validation done:** 板级用例 A/C PASS；`sim/run_tb.ps1` PASS
+- **Next step:** PL-F01 流水线，或补 OUT/DI/EI/IRET
+
 <!-- 新条目请用 templates/progress-log-entry.template.md 格式追加在上方 -->

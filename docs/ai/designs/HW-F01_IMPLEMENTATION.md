@@ -38,7 +38,8 @@
 - **Verify:** ISE reports 无 Error；记录 Fmax、LUT
 
 ### HW-F01-S04 — 顺序上板
-- **Touch:** 按 [HW-F01_BOARD_TEST](./HW-F01_BOARD_TEST.md) 执行用例 A/B
+- **Touch:** 按 [HW-F01_BOARD_TEST](./HW-F01_BOARD_TEST.md) 执行用例 A/B/C
+- **Hardware:** 飞线 **T3→C10**、**W3→N5**（§3.1，上电前必接）
 - **Verify:** 调试日志；测试程序现象符合预期
 
 ### HW-F01-S05 — 流水上板
@@ -59,4 +60,5 @@ PL-F01-S08  → HW-F01-S05
 
 | 日期 | 说明 |
 |------|------|
+| 2026-07-08 | 上板飞线 T3→C10、W3→N5；BOARD_TEST 用例 C |
 | 2026-07-06 | 初稿 |

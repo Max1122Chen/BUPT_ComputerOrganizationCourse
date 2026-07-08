@@ -1,6 +1,6 @@
 # Project Context
 
-Last updated: 2026-07-06  
+Last updated: 2026-07-08  
 Purpose: **stable snapshot** for humans and AI. Details and churn live in designs + PROGRESS_LOG.
 
 ---
@@ -36,6 +36,8 @@ Purpose: **stable snapshot** for humans and AI. Details and churn live in design
 | ADR | [ADR-20260706-01](./adrs/ADR-20260706-01-platform-ise-tecplus.md) |
 
 拨码：**硬连线模式**。
+
+**上板飞线（必需）：** 时序发生器 **T3 → FPGA C10**，**W3 → FPGA N5**（面板 W3 灯 ≠ FPGA 输入；见 [HW-F01_BOARD_TEST §3.1](./designs/HW-F01_BOARD_TEST.md)）。
 
 ---
 
@@ -81,9 +83,9 @@ docs/course/   课设 PDF/图片
 | 工程纪律 | WF-F01 | **Done** |
 | 需求/设计 | 总纲 + ADR | **Approved** |
 | **基础 RTL** | CTL-F01 | **Done** |
-| **仿真** | SIM-F01 | **In Progress**（核心 PASS） |
-| **上板** | HW-F01 | **Planned** ← 下一步 |
-| 进阶 | PL-F01 | Planned |
+| **仿真** | SIM-F01 | **Done**（核心 PASS） |
+| **上板（基础）** | HW-F01 | **Done**（2026-07-08） |
+| 进阶 | PL-F01 | Planned ← 下一步 |
 
 详见 [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)、[ACTIVE_WORK](./ACTIVE_WORK.md)。
 

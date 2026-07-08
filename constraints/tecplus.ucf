@@ -1,8 +1,13 @@
 # TEC-PLUS hardwired controller — Spartan-6 XC6SLX9 (image-47)
 # Populated in HW-F01-S01; names match rtl/top/top.v
+#
+# REQUIRED fly wires (board default does not route these to FPGA):
+#   Timing generator T3  ->  FPGA pin C10  (controller STO / sync)
+#   Timing generator W3  ->  FPGA pin N5   (LD/ST third beat; panel W3 LED != FPGA input)
+# See docs/ai/designs/HW-F01_BOARD_TEST.md §3.1
 
 NET "CLR_n" LOC = F6;
-NET "T3"    LOC = C10;
+NET "T3"    LOC = C10;   # fly wire from timing generator T3
 NET "SWA"   LOC = K11;
 NET "SWB"   LOC = F7;
 NET "SWC"   LOC = J12;
@@ -12,7 +17,7 @@ NET "IR6"   LOC = J11;
 NET "IR7"   LOC = E12;
 NET "W1"    LOC = F9;
 NET "W2"    LOC = K12;
-NET "W3"    LOC = N5;
+NET "W3"    LOC = N5;    # fly wire from timing generator W3
 NET "QD"    LOC = J16;
 NET "C"     LOC = B5;
 NET "Z"     LOC = A5;
