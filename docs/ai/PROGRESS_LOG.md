@@ -97,4 +97,15 @@
 - **Validation done:** 待 ISE 重综合烧录 + 用例 C（**拔掉 W3 飞线**）
 - **Next step:** 板上验证 LD/ST 第三拍
 
+### 2026-07-09 — 回滚 PL-F01，实现转回顺序中断
+
+- **Goal:** 放弃当前流水线实现，恢复顺序版作为开发基线；保留 W3=F4 的约束与接线结论
+- **Main changes:**
+  - 回滚删除流水相关 RTL/tb（`hardwired_ctrl_pipe`/`pipe_regs`/`hazard_unit`/`tb_pipe*`）
+  - `hardwired_ctrl.v` 恢复为顺序单体实现（partner baseline replica，STO on T3↓）
+  - 保持 `constraints/tecplus.ucf` 中 `W3=F4`；仅 `T3→C10` 飞线
+  - 文档与 Feature 状态：PL-F01 → Deferred；下一步转中断相关指令
+- **Validation done:** `sim/run_tb.ps1` PASS（顺序版）
+- **Next step:** 设计 DI/EI/IRET/OUT 的顺序控制字，并对标微程序/老师资料
+
 <!-- 新条目请用 templates/progress-log-entry.template.md 格式追加在上方 -->
