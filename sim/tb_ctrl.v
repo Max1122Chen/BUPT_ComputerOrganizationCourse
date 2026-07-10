@@ -11,12 +11,14 @@ module tb_ctrl;
     reg [7:0]  ir;
     reg        W1, W2, W3;
     reg        C, Z;
+    reg        INTR;
 
     wire       DRW, PCINC, LPC, LAR, PCADD, ARINC, SELCTL, MEMW, STOP, LIR;
     wire       LDZ, LDC, CIN;
     wire       S0, S1, S2, S3, M;
     wire       ABUS, SBUS, MBUS, SHORT, LONG;
     wire       SEL0, SEL1, SEL2, SEL3;
+    wire       LIAR, IABUS;
 
     integer    errors;
 
@@ -25,7 +27,7 @@ module tb_ctrl;
         .T3(T3), .QD(QD), .SWA(SWA), .SWB(SWB), .SWC(SWC),
         .IR4(ir[4]), .IR5(ir[5]), .IR6(ir[6]), .IR7(ir[7]),
         .W1(W1), .W2(W2), .W3(W3),
-        .C(C), .Z(Z),
+        .C(C), .Z(Z), .INTR(INTR),
         .DRW(DRW), .PCINC(PCINC), .LPC(LPC), .LAR(LAR),
         .PCADD(PCADD), .ARINC(ARINC), .SELCTL(SELCTL),
         .MEMW(MEMW), .STOP(STOP), .LIR(LIR),
@@ -33,7 +35,8 @@ module tb_ctrl;
         .S0(S0), .S1(S1), .S2(S2), .S3(S3), .M(M),
         .ABUS(ABUS), .SBUS(SBUS), .MBUS(MBUS),
         .SHORT(SHORT), .LONG(LONG),
-        .SEL0(SEL0), .SEL1(SEL1), .SEL2(SEL2), .SEL3(SEL3)
+        .SEL0(SEL0), .SEL1(SEL1), .SEL2(SEL2), .SEL3(SEL3),
+        .LIAR(LIAR), .IABUS(IABUS)
     );
 
     task clear_w;
@@ -63,7 +66,7 @@ module tb_ctrl;
         errors = 0;
         CLR_n = 1;
         T3 = 0; QD = 0; SWA = 0; SWB = 0; SWC = 0;
-        ir = 8'h00; C = 0; Z = 0;
+        ir = 8'h00; C = 0; Z = 0; INTR = 0;
         clear_w();
         #1; CLR_n = 0;
         #1; CLR_n = 1;
@@ -226,6 +229,61 @@ module tb_ctrl;
         expect1(MBUS, 1'b1, "rdmem data MBUS");
         expect1(ARINC, 1'b1, "rdmem data ARINC");
         SWC = 0; SWB = 0; SWA = 0;
+        clear_w();
+
+        // --- CTL-F02: OUT / IRET / EI / DI ---
+        ir = 8'hA0; W2 = 1; #1;
+        expect1(ABUS, 1'b1, "OUT ABUS");
+        expect1(M, 1'b1, "OUT M");
+        expect1(S3, 1'b1, "OUT S3");
+        expect1(S1, 1'b1, "OUT S1");
+        expect1(DRW, 1'b0, "OUT no DRW");
+        clear_w();
+
+        ir = 8'hB0; W2 = 1; #1;
+        expect1(IABUS, 1'b1, "IRET IABUS");
+        expect1(LPC, 1'b1, "IRET LPC");
+        clear_w();
+
+        ir = 8'hD0; W2 = 1; #1;
+        expect1(ABUS, 1'b0, "EI no ABUS");
+        step_t3();
+        clear_w();
+
+        ir = 8'hC0; W2 = 1; #1;
+        expect1(ABUS, 1'b0, "DI no ABUS");
+        step_t3();
+        clear_w();
+
+        // --- CTL-F02: interrupt W1 sequence (EI -> INTR -> ack -> load -> fetch) ---
+        ir = 8'hD0; W2 = 1; #1;
+        step_t3();
+        clear_w();
+
+        INTR = 1; step_t3();
+        clear_w();
+
+        W1 = 1; #1;
+        expect1(LIAR, 1'b1, "int ack LIAR");
+        expect1(STOP, 1'b1, "int ack STOP");
+        expect1(SHORT, 1'b1, "int ack SHORT");
+        expect1(LIR, 1'b0, "int ack no LIR");
+        expect1(PCINC, 1'b0, "int ack no PCINC");
+        step_t3();
+        clear_w();
+
+        W1 = 1; #1;
+        expect1(SBUS, 1'b1, "int load SBUS");
+        expect1(LPC, 1'b1, "int load LPC");
+        expect1(SHORT, 1'b1, "int load SHORT");
+        expect1(LIAR, 1'b0, "int load no LIAR");
+        step_t3();
+        clear_w();
+
+        INTR = 0;
+        W1 = 1; #1;
+        expect1(LIR, 1'b1, "post-int fetch LIR");
+        expect1(PCINC, 1'b1, "post-int fetch PCINC");
         clear_w();
 
         if (errors == 0)

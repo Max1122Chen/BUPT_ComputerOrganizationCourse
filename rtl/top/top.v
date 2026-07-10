@@ -18,6 +18,7 @@ module top (
     input  wire       W3,
     input  wire       C,
     input  wire       Z,
+    input  wire       INTR,
 
     output wire       DRW,
     output wire       PCINC,
@@ -45,7 +46,9 @@ module top (
     output wire       SEL0,
     output wire       SEL1,
     output wire       SEL2,
-    output wire       SEL3
+    output wire       SEL3,
+    output wire       LIAR,
+    output wire       IABUS
 );
 
     hardwired_ctrl u_ctrl (
@@ -64,6 +67,7 @@ module top (
         .W3     (W3),
         .C      (C),
         .Z      (Z),
+        .INTR   (INTR),
         .DRW    (DRW),
         .PCINC  (PCINC),
         .LPC    (LPC),
@@ -90,7 +94,9 @@ module top (
         .SEL0   (SEL0),
         .SEL1   (SEL1),
         .SEL2   (SEL2),
-        .SEL3   (SEL3)
+        .SEL3   (SEL3),
+        .LIAR   (LIAR),
+        .IABUS  (IABUS)
     );
 
 endmodule

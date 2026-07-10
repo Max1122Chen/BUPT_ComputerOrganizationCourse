@@ -1,13 +1,13 @@
-// TEC-PLUS hardwired controller — partner baseline replica (T3-clocked STO)
-// Source: partner controller.v (docs/状态转移-信号真值表.md)
-// STO: SSTO set in combo logic, latched on negedge T3 (after AR LAR load at T3↑).
+// TEC-PLUS hardwired controller �sequential baseline + interrupt (CTL-F02)
+// STO: SSTO set in combo logic, latched on negedge T3 (after AR LAR load at T3�
+// INTR = PAUSE button; LIAR/IABUS for IAR save/restore (fly wires N4/N5).
 
 `timescale 1ns / 1ps
 
 module hardwired_ctrl (
     input  wire       CLR_n,
     input  wire       T3,
-    input  wire       QD,       // board pin; not used in partner baseline
+    input  wire       QD,       // board pin; not used in interrupt flow
     input  wire       SWA,
     input  wire       SWB,
     input  wire       SWC,
@@ -20,6 +20,7 @@ module hardwired_ctrl (
     input  wire       W3,
     input  wire       C,
     input  wire       Z,
+    input  wire       INTR,     // PAUSE / interrupt request (G6)
 
     output reg        DRW,
     output reg        PCINC,
@@ -47,7 +48,9 @@ module hardwired_ctrl (
     output reg        SEL0,
     output reg        SEL1,
     output reg        SEL2,
-    output reg        SEL3
+    output reg        SEL3,
+    output reg        LIAR,     // IAR <- PC (N4)
+    output reg        IABUS     // IAR -> DBUS (N5)
 );
 
     wire [2:0] mode = {SWC, SWB, SWA};
@@ -55,6 +58,11 @@ module hardwired_ctrl (
 
     reg        STO;
     reg        SSTO;
+    reg        EINT;
+    reg        INTQ;
+    reg        IWAIT;
+    reg        int_ack_consumed;
+    reg        int_load_consumed;
 
     localparam RUN    = 3'b000;
     localparam WR_REG = 3'b100;
@@ -64,7 +72,13 @@ module hardwired_ctrl (
 
     localparam ADD = 4'b0001, SUB = 4'b0010, AND_ = 4'b0011, INC = 4'b0100;
     localparam LD  = 4'b0101, ST  = 4'b0110, JC  = 4'b0111, JZ  = 4'b1000;
-    localparam JMP = 4'b1001, STP = 4'b1110;
+    localparam JMP = 4'b1001, OUT = 4'b1010, IRET = 4'b1011, DI = 4'b1100;
+    localparam EI  = 4'b1101, STP = 4'b1110;
+
+    wire int_ack  = (mode == RUN) & W1 & INTQ & EINT;
+    wire int_load = (mode == RUN) & W1 & IWAIT;
+    wire set_ei   = (mode == RUN) & W2 & (op == EI);
+    wire set_di   = (mode == RUN) & W2 & (op == DI);
 
     wire clr_reg = ((mode == WR_REG) | (mode == RD_REG)) & STO & W2;
 
@@ -75,6 +89,35 @@ module hardwired_ctrl (
             STO <= 1'b0;
         else if (SSTO)
             STO <= 1'b1;
+    end
+
+    always @(negedge T3 or negedge CLR_n) begin
+        if (!CLR_n) begin
+            EINT  <= 1'b0;
+            INTQ  <= 1'b0;
+            IWAIT <= 1'b0;
+            int_ack_consumed <= 1'b0;
+            int_load_consumed <= 1'b0;
+        end else begin
+				if (set_ei)
+                EINT <= 1'b1;
+            else if (set_di)
+                EINT <= 1'b0;
+
+            if (int_ack & !int_ack_consumed)
+                int_ack_consumed <= 1'b1;
+            else if(int_ack & int_ack_consumed) begin
+                INTQ <= 1'b0;
+                int_ack_consumed <= 1'b0;
+            end
+            else    // int_ack == 0
+                INTQ <= (INTR & EINT);
+
+            if (int_ack_consumed)
+                IWAIT <= 1'b1;
+            else if (int_load)
+                IWAIT <= 1'b0;
+        end
     end
 
     always @(*) begin
@@ -105,13 +148,25 @@ module hardwired_ctrl (
         SEL1   = 1'b0;
         SEL2   = 1'b0;
         SEL3   = 1'b0;
+        LIAR   = 1'b0;
+        IABUS  = 1'b0;
         SSTO   = 1'b0;
 
         case (mode)
         RUN: begin
             if (W1) begin
-                LIR   = 1'b1;
-                PCINC = 1'b1;
+                if (INTQ) begin
+                    LIAR  = 1'b1;
+                    STOP  = 1'b1;
+                    SHORT = 1'b1;
+                end else if (IWAIT) begin
+                    SBUS  = 1'b1;
+                    LPC   = 1'b1;
+                    SHORT = 1'b1;
+                end else begin
+                    LIR   = 1'b1;
+                    PCINC = 1'b1;
+                end
             end else if (W2) begin
                 case (op)
                 ADD: begin
@@ -144,6 +199,16 @@ module hardwired_ctrl (
                     M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
                     ABUS = 1'b1; LPC = 1'b1;
                 end
+                OUT: begin
+                    M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
+                    ABUS = 1'b1;
+                end
+                IRET: begin
+                    IABUS = 1'b1;
+                    LPC   = 1'b1;
+                end
+                EI: ;
+                DI: ;
                 STP: STOP = 1'b1;
                 default: ;
                 endcase

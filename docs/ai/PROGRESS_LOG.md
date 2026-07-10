@@ -97,6 +97,24 @@
 - **Validation done:** 待 ISE 重综合烧录 + 用例 C（**拔掉 W3 飞线**）
 - **Next step:** 板上验证 LD/ST 第三拍
 
+### 2026-07-10 — CTL-F02 文档对齐用户最终实现
+
+- **Goal:** 设计文档与 `hardwired_ctrl.v` 一致，消除与伙伴参考/旧方案的歧义
+- **Main changes:** `CTL-F02_DESIGN` §3 重写（`int_ack_consumed` 两拍清 INTQ、W1 优先级 INTQ→IWAIT、EINT 不随响应清零）
+- **Validation done:** 与用户板测通过版 RTL 对照
+- **Next step:** commit CTL-F02
+
+### 2026-07-09 — CTL-F02 顺序中断扩展（sim PASS）
+
+- **Goal:** OUT/DI/EI/IRET + INTR 中断响应（PAUSE=INTR）；LIAR/IABUS 飞线
+- **Main changes:**
+  - `hardwired_ctrl.v`：EINT/INTQ/IWAIT；W1 中断优先；INTQ 电平锁存 `INTQ | (INTR&EINT)`
+  - `top.v`、`constraints/tecplus.ucf`：INTR G6、LIAR N4、IABUS N5
+  - `sim/tb_ctrl.v`：OUT/IRET/EI/DI + 中断 W1 序列
+  - 文档：`CTL-F02_DESIGN` / `CTL-F02_IMPLEMENTATION`；BOARD_TEST §11 用例 D
+- **Validation done:** `sim/run_tb.ps1` PASS
+- **Next step:** ISE 重综合烧录；用户板上用例 D 验收
+
 ### 2026-07-09 — 回滚 PL-F01，实现转回顺序中断
 
 - **Goal:** 放弃当前流水线实现，恢复顺序版作为开发基线；保留 W3=F4 的约束与接线结论

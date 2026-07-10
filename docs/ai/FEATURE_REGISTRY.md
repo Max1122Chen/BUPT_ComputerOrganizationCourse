@@ -1,6 +1,6 @@
 # Feature Registry
 
-Last updated: 2026-07-08  
+Last updated: 2026-07-09  
 Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 
 ---
@@ -11,6 +11,7 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 |------------|-------|--------|-------|----------------|
 | `WF-F01` | 工程纪律、文档模板、Cursor 规则、verify 脚本 | **Done** | — | [DOC_GOVERNANCE](./templates/DOC_GOVERNANCE.md) |
 | `CTL-F01` | 顺序硬布线控制器（基础） | **Done** | — | [DESIGN](./designs/CTL-F01_DESIGN.md) · `rtl/controller/hardwired_ctrl.v` |
+| `CTL-F02` | 顺序中断扩展（OUT/DI/EI/IRET + INTR） | **Done** | — | [DESIGN](./designs/CTL-F02_DESIGN.md) · 板测通过 |
 | `SIM-F01` | 仿真 Testbench 与控制字回归 | **Done** | — | `tb_ctrl` PASS |
 | `HW-F01` | UCF、ISE 综合、上板（基础） | **Done** | — | [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) |
 | `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **Deferred** | — | [DESIGN](./designs/PL-F01_DESIGN.md)（已回滚实现） |
@@ -24,7 +25,7 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 | DOMAIN | Next Feature # |
 |--------|----------------|
 | `WF` | F02 |
-| `CTL` | F02 |
+| `CTL` | F03 |
 | `PL` | F02 |
 | `SIM` | F02 |
 | `HW` | F02 |

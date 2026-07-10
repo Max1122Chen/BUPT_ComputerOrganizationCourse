@@ -1,0 +1,53 @@
+#======================================================================
+# TEC-PLUS 带中断机制硬布线控制器 引脚约束 (Spartan-6 XC6SLX9-2FTG256)
+# 依据 docs/2026计算机组成原理课程设计-图片-47.jpg
+# 在 controller.ucf 基础上新增：INTR / LIAR / IABUS
+#======================================================================
+
+#------------------------- 输入 -------------------------
+NET "CLRn" LOC = "F6";
+NET "T3"   LOC = "C10";
+NET "SWA"  LOC = "K11";
+NET "SWB"  LOC = "F7";
+NET "SWC"  LOC = "J12";
+NET "IR4"  LOC = "G12";
+NET "IR5"  LOC = "E11";
+NET "IR6"  LOC = "J11";
+NET "IR7"  LOC = "E12";
+NET "W1"   LOC = "F9";
+NET "W2"   LOC = "K12";
+NET "W3"   LOC = "F4";
+NET "C"    LOC = "B5";
+NET "Z"    LOC = "A5";
+NET "INTR" LOC = "G6";    # 中断请求（PULSE 按钮），如与平台实际按钮引脚冲突请按板卡调整
+
+#------------------------- 输出 -------------------------
+NET "LDZ"    LOC = "R16";
+NET "LDC"    LOC = "E3";
+NET "CIN"    LOC = "R15";
+NET "S0"     LOC = "R14";
+NET "S1"     LOC = "H11";
+NET "S2"     LOC = "T15";
+NET "S3"     LOC = "C13";
+NET "M"      LOC = "A7";
+NET "ABUS"   LOC = "B8";
+NET "DRW"    LOC = "A13";
+NET "PCINC"  LOC = "T14";
+NET "LPC"    LOC = "C5";
+NET "LAR"    LOC = "E6";
+NET "PCADD"  LOC = "C11";
+NET "ARINC"  LOC = "P15";
+NET "SELCTL" LOC = "B10";
+NET "MEMW"   LOC = "C8";
+NET "STOP"   LOC = "C9";
+NET "LIR"    LOC = "D8";
+NET "SBUS"   LOC = "A8";
+NET "MBUS"   LOC = "A14";
+NET "SHORT"  LOC = "A6";
+NET "LONG"   LOC = "B6";
+NET "SEL0"   LOC = "C6";
+NET "SEL1"   LOC = "A11";
+NET "SEL2"   LOC = "C7";
+NET "SEL3"   LOC = "A12";
+NET "LIAR"   LOC = "N4";   # IAR<-PC 保存断点；须确认平台已引出 IAR 装载端
+NET "IABUS"  LOC = "N5";   # IAR->DBUS 返回断点；须确认平台已引出 IAR 送总线端

@@ -4,6 +4,7 @@
 # REQUIRED fly wire (board default does not route this to FPGA):
 #   Timing generator T3  ->  FPGA pin C10  (controller STO / sync)
 # W3: internal bench wiring to FPGA F4 (teacher confirmed 2026-07-08); no fly wire.
+# CTL-F02 fly wires: LIAR N4, IABUS N5 (IAR save/restore); INTR G6 = PAUSE button.
 # See docs/ai/designs/HW-F01_BOARD_TEST.md §3.1
 
 NET "CLR_n" LOC = F6;
@@ -21,6 +22,7 @@ NET "W3"    LOC = F4;    # internal wiring from timing generator (not N5)
 NET "QD"    LOC = J16;
 NET "C"     LOC = B5;
 NET "Z"     LOC = A5;
+NET "INTR"  LOC = G6;    # PAUSE / interrupt request
 
 NET "LDZ"    LOC = R16;
 NET "LDC"    LOC = E3;
@@ -49,3 +51,5 @@ NET "SEL0"   LOC = C6;
 NET "SEL1"   LOC = A11;
 NET "SEL2"   LOC = C7;
 NET "SEL3"   LOC = A12;
+NET "LIAR"   LOC = N4;   # IAR <- PC (fly wire)
+NET "IABUS"  LOC = N5;   # IAR -> DBUS (fly wire)

@@ -1,9 +1,9 @@
 # Active work (agent backlog)
 
-Last updated: 2026-07-08  
+Last updated: 2026-07-09  
 Purpose: **short, human-maintained** list for session handoff.
 
-> **下一会话首句（建议）：** 已回滚到顺序版；开始做中断相关指令（DI/EI/IRET/OUT）顺序控制字设计与对标。
+> **下一会话首句（建议）：** CTL-F02 仿真 PASS；请按 HW-F01 §11 上板测中断（EI→PAUSE→装入口→ISR→IRET）。
 
 ---
 
@@ -11,30 +11,30 @@ Purpose: **short, human-maintained** list for session handoff.
 
 | 项 | 状态 |
 |----|------|
-| **CTL-F01** 顺序硬布线 | **Done**（手动模式 + RUN 已实现指令上板通过） |
-| **SIM-F01** 仿真 | **Done**（`tb_ctrl` PASS） |
-| **HW-F01** 上板（基础层次） | **Done** — 飞线 T3→C10；W3 板内 F4 |
-| **PL-F01** 流水线 | **Deferred**（实现已回滚；后续再评估） |
+| **CTL-F01** 顺序硬布线 | **Done** |
+| **CTL-F02** 中断拓展 | **Done** — RTL+UCF+sim+板测 |
+| **SIM-F01** 仿真 | **Done**（`tb_ctrl` + `tb_manual_sto` PASS） |
+| **HW-F01** 上板 | **Done**（基础）；拓展飞线见 §3.1 |
+| **PL-F01** 流水线 | **Deferred** |
 
 ### 里程碑
 
 ```text
 [M1 仿真]  Done   — iverilog + tb_ctrl PASS
-[M2 上板]  Done   — 手动模式 + 指令集（已实现部分）板级 PASS
-[M3 进阶]  未开始 — PL-F01（Deferred）
+[M2 上板]  Done   — 基础层次 PASS
+[M3 拓展]  Done   — CTL-F02 中断
+[M4 进阶]  Deferred — PL-F01
 ```
 
 ---
 
 ## 交接要点
 
-- **平台：** TEC-PLUS + ISE 14.7（[ADR-20260706-01](./adrs/ADR-20260706-01-platform-ise-tecplus.md)）
-- **RTL 入口：** `rtl/controller/hardwired_ctrl.v`，顶层 `rtl/top/top.v`
-- **约束：** `constraints/tecplus.ucf`
-- **必需飞线：** 仅 **T3→C10**；W3 板内 **F4**（[HW-F01_BOARD_TEST §3.1](./designs/HW-F01_BOARD_TEST.md)）
-- **仿真：** `.\sim\run_tb.ps1`
-- **上板用例：** [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) 用例 A/C
-- **当前准备：** 顺序版中断相关指令设计（DI/EI/IRET/OUT；见 TD-004/006）
+- **RTL：** `rtl/controller/hardwired_ctrl.v`（含 INTR/LIAR/IABUS）
+- **约束：** `constraints/tecplus.ucf` — W3=F4；INTR=G6；LIAR=N4；IABUS=N5
+- **飞线：** T3→C10；LIAR→N4；IABUS→N5；PAUSE=INTR（板内 G6）
+- **仿真：** `.\sim\run_tb.ps1` PASS
+- **上板：** [HW-F01_BOARD_TEST §11](./designs/HW-F01_BOARD_TEST.md) 用例 D
 
 ---
 
@@ -43,14 +43,14 @@ Purpose: **short, human-maintained** list for session handoff.
 | Check | Command | 当前 |
 |-------|---------|------|
 | Sanity | `.\scripts\verify.ps1 -Stage 0` | PASS |
-| Sim | `.\scripts\verify.ps1 -Stage 1` | PASS（iverilog） |
-| Board | 用例 A/C + **T3→C10**；W3=F4 无飞线 | 待 F4 UCF 重烧录复测 |
+| Sim | `.\sim\run_tb.ps1` | PASS |
+| Board | 用例 D（中断） | **Done** |
 
 ---
 
 ## Explicitly not backlog
 
-- 拓展中断专题
+- PL-F01 流水线（Deferred）
 
 ---
 
@@ -58,6 +58,6 @@ Purpose: **short, human-maintained** list for session handoff.
 
 | File | Role |
 |------|------|
-| [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md) | 切片总览 |
-| [PROGRESS_LOG](./PROGRESS_LOG.md) | 调试/开发日志 |
 | [FEATURE_REGISTRY](./FEATURE_REGISTRY.md) | Feature 状态 |
+| [CTL-F02_DESIGN](./designs/CTL-F02_DESIGN.md) | 中断设计 |
+| [PROGRESS_LOG](./PROGRESS_LOG.md) | 时间线 |
