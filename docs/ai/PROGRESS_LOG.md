@@ -126,6 +126,20 @@
 - **Validation done:** `sim/run_tb.ps1` PASS（顺序版）
 - **Next step:** 设计 DI/EI/IRET/OUT 的顺序控制字，并对标微程序/老师资料
 
+### 2026-07-10 — PL-F01 板上综合测试通过
+
+- **Goal:** 程序 B 综合验收流水控制器
+- **Main changes:** 修正板测文档 R3/JC 预期（`SUB R0,R0` 后 C=1）；访存排他 IF RTL
+- **Validation done:** 板上程序 B 通过；`sim/run_tb.ps1` PASS
+- **Next step:** 可选 commit；S08 性能文档
+
+### 2026-07-10 — PL-F01 访存排他 IF 修复
+
+- **Goal:** 修复 LD/ST MEM 写回用错 IR3:0（提前 IF 覆盖 IR）
+- **Main changes:** `deny_if` 屏蔽 LD/ST EX+MEM 的 `LIR+PCINC`；MEM 后 `instr_cached<=0` 再 IF；设计/板测时序表更新
+- **Validation done:** `sim/run_tb.ps1` PASS
+- **Next step:** 板上重测程序 B；可选第二 commit
+
 ### 2026-07-10 — PL-F01 流水 RTL S01–S07（sim PASS）
 
 - **Goal:** 按 §3 `Opcode_cache` + `allow_ex` 模型实现流水控制器 v1（无中断）

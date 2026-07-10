@@ -70,6 +70,9 @@ module hardwired_ctrl_pipe (
 
     wire       pipe_run = (mode == RUN);
     wire       is_mem_op = (opcode_cache == LD) || (opcode_cache == ST);
+    // LD/ST EX+MEM must not overlap IF: datapath uses live IR3:0 on MEM writeback
+    wire       deny_if = pipe_run && instr_cached &&
+                         ((allow_ex && is_mem_op) || !allow_ex);
 
     wire       stage_ex  = pipe_run && allow_ex && instr_cached;
     wire       stage_mem = pipe_run && !allow_ex && instr_cached;
@@ -142,8 +145,7 @@ module hardwired_ctrl_pipe (
                 end
             end else begin
                 deny_ex      <= 1'b0;
-                opcode_cache <= op_in;
-                instr_cached <= 1'b1;
+                instr_cached <= 1'b0;
                 allow_ex     <= 1'b1;
             end
         end
@@ -251,7 +253,7 @@ module hardwired_ctrl_pipe (
                     MBUS  = core_mbus;
                     LONG  = core_long;
                 end
-                if (!branch_flush) begin
+                if (!branch_flush && !deny_if) begin
                     LIR   = 1'b1;
                     PCINC = 1'b1;
                 end
