@@ -4,6 +4,20 @@
 
 ---
 
+### 2026-07-10 — PL-F02 流水线中断扩展（sim PASS）
+
+- **Goal:** 让流水版控制器支持可演示的 `EI -> INTR -> LIAR -> 装入口 -> IRET`
+- **Main changes:**
+  - 新建 `PL-F02_DESIGN` / `PL-F02_IMPLEMENTATION`；登记 `PL-F02`
+  - `hardwired_ctrl_core.v`：扩展 `OUT/DI/EI/IRET` 的 RUN 译码
+  - `hardwired_ctrl_pipe.v`：加入 `EINT/INTQ/IWAIT`、interrupt stall、drain 后中断握手
+  - `top.v`：接通 `INTR/LIAR/IABUS`
+  - `tb_pipe.v`：新增 EX 命中中断、`LIAR/load`、`IRET` 回归
+- **Validation done:** `sim/run_tb.ps1` PASS（`tb_ctrl` / `tb_manual_sto` / `tb_pipe`）
+- **Next step:** 编写流水版中断板测程序并上板验证
+
+---
+
 ### 2026-07-06 — 工程纪律骨架落地 (WF-F01)
 
 - **Goal:** 从 minEngine 迁移轻量文档 + ID + 验证工作流到本课设仓库

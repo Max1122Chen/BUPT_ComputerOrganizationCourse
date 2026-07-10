@@ -15,6 +15,7 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 | `SIM-F01` | 仿真 Testbench 与控制字回归 | **Done** | — | `tb_ctrl` PASS |
 | `HW-F01` | UCF、ISE 综合、上板（基础） | **Done** | — | [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) |
 | `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **In Progress** | — | [DESIGN](./designs/PL-F01_DESIGN.md) §3 + [IMPLEMENTATION](./designs/PL-F01_IMPLEMENTATION.md) |
+| `PL-F02` | 流水线中断扩展（drain + LIAR/IABUS + IRET） | **In Progress** | — | [DESIGN](./designs/PL-F02_DESIGN.md) |
 
 **总纲：** [REQUIREMENTS_ANALYSIS](./designs/REQUIREMENTS_ANALYSIS.md)（Approved）· [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)
 
@@ -26,7 +27,7 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 |--------|----------------|
 | `WF` | F02 |
 | `CTL` | F03 |
-| `PL` | F02 |
+| `PL` | F03 |
 | `SIM` | F02 |
 | `HW` | F02 |
 

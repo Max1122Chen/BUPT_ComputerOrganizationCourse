@@ -1,4 +1,4 @@
-// Pipeline control-vector testbench for hardwired_ctrl_pipe (PL-F01 §3.4, mem-exclusive IF)
+// Pipeline control-vector testbench for hardwired_ctrl_pipe (PL-F01 + PL-F02)
 
 `timescale 1ns / 1ps
 
@@ -11,18 +11,22 @@ module tb_pipe;
     reg [7:0]  ir;
     reg        W1, W2, W3;
     reg        C, Z;
+    reg        INTR;
 
     wire       DRW, PCINC, LPC, LAR, PCADD, ARINC, SELCTL, MEMW, STOP, LIR;
     wire       LDZ, LDC, CIN;
     wire       S0, S1, S2, S3, M;
     wire       ABUS, SBUS, MBUS, SHORT, LONG;
     wire       SEL0, SEL1, SEL2, SEL3;
+    wire       LIAR, IABUS;
 
     integer    errors;
 
     localparam LD  = 8'h56;
     localparam ADD = 8'h11;
     localparam INC = 8'h40;
+    localparam EI  = 8'hD0;
+    localparam IRET = 8'hB0;
     localparam JMP = 8'h90;
 
     hardwired_ctrl_pipe dut (
@@ -30,7 +34,7 @@ module tb_pipe;
         .T3(T3), .QD(QD), .SWA(SWA), .SWB(SWB), .SWC(SWC),
         .IR4(ir[4]), .IR5(ir[5]), .IR6(ir[6]), .IR7(ir[7]),
         .W1(W1), .W2(W2), .W3(W3),
-        .C(C), .Z(Z),
+        .C(C), .Z(Z), .INTR(INTR),
         .DRW(DRW), .PCINC(PCINC), .LPC(LPC), .LAR(LAR),
         .PCADD(PCADD), .ARINC(ARINC), .SELCTL(SELCTL),
         .MEMW(MEMW), .STOP(STOP), .LIR(LIR),
@@ -38,7 +42,8 @@ module tb_pipe;
         .S0(S0), .S1(S1), .S2(S2), .S3(S3), .M(M),
         .ABUS(ABUS), .SBUS(SBUS), .MBUS(MBUS),
         .SHORT(SHORT), .LONG(LONG),
-        .SEL0(SEL0), .SEL1(SEL1), .SEL2(SEL2), .SEL3(SEL3)
+        .SEL0(SEL0), .SEL1(SEL1), .SEL2(SEL2), .SEL3(SEL3),
+        .LIAR(LIAR), .IABUS(IABUS)
     );
 
     task step_t3;
@@ -73,7 +78,7 @@ module tb_pipe;
         T3 = 0; QD = 0;
         SWA = 0; SWB = 0; SWC = 0;
         W1 = 0; W2 = 0; W3 = 0;
-        ir = 8'h00; C = 0; Z = 0;
+        ir = 8'h00; C = 0; Z = 0; INTR = 0;
 
         #1; CLR_n = 0;
         #1; CLR_n = 1;
@@ -145,6 +150,72 @@ module tb_pipe;
         expect1(LPC,   1'b1, "jmp EX LPC");
         expect1(LIR,   1'b0, "jmp no LIR");
         expect1(PCINC, 1'b0, "jmp no PCINC");
+        pipe_cycle();
+
+        // --- interrupt after EX: drain current op, then LIAR x2, load ---
+        #1; CLR_n = 0; #1; CLR_n = 1;
+        ir = EI;
+        #1;
+        expect1(LIR,   1'b1, "ei IF LIR");
+        expect1(PCINC, 1'b1, "ei IF PCINC");
+        pipe_cycle();
+
+        ir = ADD;
+        #1;
+        expect1(LIR,   1'b1, "ei EX fetch next");
+        expect1(PCINC, 1'b1, "ei EX fetch next PCINC");
+        pipe_cycle();
+
+        ir = INC;
+        INTR = 1'b1;
+        #1;
+        expect1(ABUS,  1'b1, "int EX current op completes");
+        expect1(DRW,   1'b1, "int EX current op DRW");
+        expect1(LIR,   1'b1, "int capture same-cycle fetch still visible");
+        pipe_cycle();
+
+        W1 = 1'b1;
+        INTR = 1'b0;
+        ir = ADD;
+        #1;
+        expect1(LIAR,  1'b1, "int ack LIAR");
+        expect1(STOP,  1'b1, "int ack STOP");
+        expect1(SHORT, 1'b1, "int ack SHORT");
+        expect1(LIR,   1'b0, "int ack no fetch");
+        pipe_cycle();
+
+        #1;
+        expect1(LIAR,  1'b1, "int ack2 LIAR");
+        expect1(STOP,  1'b1, "int ack2 STOP");
+        expect1(SHORT, 1'b1, "int ack2 SHORT");
+        expect1(SBUS,  1'b0, "int ack2 no SBUS");
+        pipe_cycle();
+
+        #1;
+        expect1(SBUS,  1'b1, "int load SBUS");
+        expect1(LPC,   1'b1, "int load LPC");
+        expect1(SHORT, 1'b1, "int load SHORT");
+        expect1(LIAR,  1'b0, "int load no LIAR");
+        pipe_cycle();
+        W1 = 1'b0;
+
+        ir = IRET;
+        #1;
+        expect1(LIR,   1'b1, "post-int IF LIR");
+        expect1(PCINC, 1'b1, "post-int IF PCINC");
+        pipe_cycle();
+
+        // --- IRET executes on EX with IABUS+LPC ---
+        #1;
+        expect1(IABUS, 1'b1, "iret IABUS");
+        expect1(LPC,   1'b1, "iret LPC");
+        expect1(LIR,   1'b0, "iret EX no IF");
+        expect1(PCINC, 1'b0, "iret EX no PCINC");
+        pipe_cycle();
+
+        #1;
+        expect1(LIR,   1'b1, "iret next IF");
+        expect1(PCINC, 1'b1, "iret next PCINC");
         pipe_cycle();
 
         // --- manual WR_REG bypass (W1) ---

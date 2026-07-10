@@ -26,12 +26,14 @@ module hardwired_ctrl_core (
     output reg        M,
     output reg        ABUS,
     output reg        MBUS,
+output reg        IABUS,
     output reg        LONG
 );
 
     localparam ADD = 4'b0001, SUB = 4'b0010, AND_ = 4'b0011, INC = 4'b0100;
-    localparam LD  = 4'b0101, ST  = 4'b0110, JC  = 4'b0111, JZ  = 4'b1000;
-    localparam JMP = 4'b1001, STP = 4'b1110;
+localparam LD  = 4'b0101, ST  = 4'b0110, JC  = 4'b0111, JZ  = 4'b1000;
+localparam JMP = 4'b1001, OUT = 4'b1010, IRET = 4'b1011, DI = 4'b1100;
+localparam EI  = 4'b1101, STP = 4'b1110;
 
     wire jc_taken = (op == JC) && C;
     wire jz_taken = (op == JZ) && Z;
@@ -54,6 +56,7 @@ module hardwired_ctrl_core (
         M      = 1'b0;
         ABUS   = 1'b0;
         MBUS   = 1'b0;
+        IABUS  = 1'b0;
         LONG   = 1'b0;
 
         if (stage_ex) begin
@@ -88,6 +91,16 @@ module hardwired_ctrl_core (
                 M = 1'b1; S3 = 1'b1; S2 = 1'b1; S1 = 1'b1; S0 = 1'b1;
                 ABUS = 1'b1; LPC = 1'b1;
             end
+            OUT: begin
+                M = 1'b1; S3 = 1'b1; S2 = 1'b0; S1 = 1'b1; S0 = 1'b0;
+                ABUS = 1'b1;
+            end
+            IRET: begin
+                IABUS = 1'b1;
+                LPC   = 1'b1;
+            end
+            EI: ;
+            DI: ;
             STP: STOP = 1'b1;
             default: ;
             endcase

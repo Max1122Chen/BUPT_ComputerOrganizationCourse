@@ -1,5 +1,6 @@
-// PL-F01 — pipelined hardwired controller (Opcode_cache + allow_ex phase model)
-// v1: RUN basic 10 instructions only; no interrupt. Manual modes bypass pipeline.
+// PL-F02 — pipelined hardwired controller with drain-then-interrupt support.
+// Interrupt business logic follows feat/ctl-seq-interrupt: keep INTQ until LIAR
+// is consumed, then enter IWAIT/load-entry.
 
 `timescale 1ns / 1ps
 
@@ -19,6 +20,7 @@ module hardwired_ctrl_pipe (
     input  wire       W3,
     input  wire       C,
     input  wire       Z,
+    input  wire       INTR,
 
     output reg        DRW,
     output reg        PCINC,
@@ -46,7 +48,9 @@ module hardwired_ctrl_pipe (
     output reg        SEL0,
     output reg        SEL1,
     output reg        SEL2,
-    output reg        SEL3
+    output reg        SEL3,
+    output reg        LIAR,
+    output reg        IABUS
 );
 
     wire [2:0] mode = {SWC, SWB, SWA};
@@ -66,20 +70,33 @@ module hardwired_ctrl_pipe (
     reg        allow_ex;
     reg        deny_ex;
     reg        instr_cached;
+    reg        EINT;
+    reg        INTQ;
+    reg        IWAIT;
+    reg        int_ack_consumed;
     reg [3:0]  opcode_cache;
 
     wire       pipe_run = (mode == RUN);
     wire       is_mem_op = (opcode_cache == LD) || (opcode_cache == ST);
+    wire       is_iret = (opcode_cache == 4'b1011);
+    wire       pipe_idle = pipe_run && allow_ex && !instr_cached;
+    wire       int_stall = pipe_run && (INTQ || IWAIT);
+    wire       int_ack   = pipe_idle && W1 && INTQ && EINT;
+    wire       int_load  = pipe_idle && W1 && IWAIT;
+    wire       intr_capture = pipe_run && INTR && EINT;
     // LD/ST EX+MEM must not overlap IF: datapath uses live IR3:0 on MEM writeback
-    wire       deny_if = pipe_run && instr_cached &&
-                         ((allow_ex && is_mem_op) || !allow_ex);
+    wire       deny_if = int_stall ||
+                         (pipe_run && instr_cached &&
+                         ((allow_ex && is_mem_op) || !allow_ex));
 
     wire       stage_ex  = pipe_run && allow_ex && instr_cached;
     wire       stage_mem = pipe_run && !allow_ex && instr_cached;
+    wire       set_ei = stage_ex && (opcode_cache == 4'b1101);
+    wire       set_di = stage_ex && (opcode_cache == 4'b1100);
 
     wire       core_drw, core_lpc, core_lar, core_pcadd, core_memw, core_stop;
     wire       core_ldz, core_ldc, core_cin;
-    wire       core_s0, core_s1, core_s2, core_s3, core_m, core_abus, core_mbus, core_long;
+    wire       core_s0, core_s1, core_s2, core_s3, core_m, core_abus, core_mbus, core_iabus, core_long;
     wire       branch_taken;
 
     hardwired_ctrl_core u_core (
@@ -105,10 +122,12 @@ module hardwired_ctrl_pipe (
         .M            (core_m),
         .ABUS         (core_abus),
         .MBUS         (core_mbus),
+        .IABUS        (core_iabus),
         .LONG         (core_long)
     );
 
     wire branch_flush = pipe_run && allow_ex && instr_cached && branch_taken;
+    wire iret_flush = pipe_run && allow_ex && instr_cached && is_iret;
     wire clr_reg = ((mode == WR_REG) | (mode == RD_REG)) & STO & W2;
 
     always @(negedge T3 or negedge CLR_n) begin
@@ -125,20 +144,57 @@ module hardwired_ctrl_pipe (
             allow_ex     <= 1'b1;
             deny_ex      <= 1'b0;
             instr_cached <= 1'b0;
+            EINT         <= 1'b0;
+            INTQ         <= 1'b0;
+            IWAIT        <= 1'b0;
+            int_ack_consumed <= 1'b0;
             opcode_cache <= 4'b0000;
         end else if (pipe_run) begin
-            if (branch_flush) begin
+            if (set_ei)
+                EINT <= 1'b1;
+            else if (set_di)
+                EINT <= 1'b0;
+
+            if (int_ack && !int_ack_consumed) begin
+                int_ack_consumed <= 1'b1;
+            end else if (int_ack && int_ack_consumed) begin
+                INTQ <= 1'b0;
+                int_ack_consumed <= 1'b0;
+            end else begin
+                INTQ <= intr_capture;
+            end
+
+            if (int_ack_consumed)
+                IWAIT <= 1'b1;
+            else if (int_load)
+                IWAIT <= 1'b0;
+
+            if (int_ack || int_load) begin
+                instr_cached <= 1'b0;
+                deny_ex      <= 1'b0;
+                allow_ex     <= 1'b1;
+            end else if (iret_flush) begin
+                instr_cached <= 1'b0;
+                deny_ex      <= 1'b0;
+                allow_ex     <= 1'b1;
+            end else if (branch_flush) begin
                 instr_cached <= 1'b0;
                 deny_ex      <= 1'b0;
                 allow_ex     <= 1'b1;
             end else if (allow_ex) begin
                 if (!instr_cached) begin
-                    opcode_cache <= op_in;
-                    instr_cached <= 1'b1;
+                    if (!INTQ && !IWAIT) begin
+                        opcode_cache <= op_in;
+                        instr_cached <= 1'b1;
+                    end
                     allow_ex     <= 1'b1;
                 end else if (is_mem_op) begin
                     deny_ex      <= 1'b1;
                     allow_ex     <= 1'b0;
+                end else if (INTQ || intr_capture) begin
+                    deny_ex      <= 1'b0;
+                    instr_cached <= 1'b0;
+                    allow_ex     <= 1'b1;
                 end else begin
                     opcode_cache <= op_in;
                     allow_ex     <= 1'b1;
@@ -179,6 +235,8 @@ module hardwired_ctrl_pipe (
         SEL1   = 1'b0;
         SEL2   = 1'b0;
         SEL3   = 1'b0;
+        LIAR   = 1'b0;
+        IABUS  = 1'b0;
         SSTO   = 1'b0;
 
         if (!pipe_run) begin
@@ -233,7 +291,15 @@ module hardwired_ctrl_pipe (
             default: ;
             endcase
         end else begin
-            if (allow_ex) begin
+            if (pipe_idle && W1 && INTQ) begin
+                LIAR  = 1'b1;
+                STOP  = 1'b1;
+                SHORT = 1'b1;
+            end else if (int_load) begin
+                SBUS  = 1'b1;
+                LPC   = 1'b1;
+                SHORT = 1'b1;
+            end else if (allow_ex) begin
                 if (instr_cached) begin
                     DRW   = core_drw;
                     LPC   = core_lpc;
@@ -251,9 +317,10 @@ module hardwired_ctrl_pipe (
                     M     = core_m;
                     ABUS  = core_abus;
                     MBUS  = core_mbus;
+                    IABUS = core_iabus;
                     LONG  = core_long;
                 end
-                if (!branch_flush && !deny_if) begin
+                if (!branch_flush && !iret_flush && !deny_if) begin
                     LIR   = 1'b1;
                     PCINC = 1'b1;
                 end
@@ -274,6 +341,7 @@ module hardwired_ctrl_pipe (
                 M     = core_m;
                 ABUS  = core_abus;
                 MBUS  = core_mbus;
+                IABUS = core_iabus;
                 LONG  = core_long;
             end
         end

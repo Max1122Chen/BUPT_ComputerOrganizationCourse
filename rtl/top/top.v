@@ -1,5 +1,4 @@
-// TEC-PLUS top — PL-F01 pipelined hardwired controller (data path on lab board)
-// Sequential + interrupt baseline: hardwired_ctrl.v (feat/ctl-seq-interrupt)
+// TEC-PLUS top — pipelined hardwired controller with interrupt support.
 
 `timescale 1ns / 1ps
 
@@ -19,7 +18,7 @@ module top (
     input  wire       W3,
     input  wire       C,
     input  wire       Z,
-    input  wire       INTR,     // UCF G6; unused in pipe v1 (no interrupt)
+    input  wire       INTR,
 
     output wire       DRW,
     output wire       PCINC,
@@ -48,12 +47,9 @@ module top (
     output wire       SEL1,
     output wire       SEL2,
     output wire       SEL3,
-    output wire       LIAR,     // UCF N4; tied low in pipe v1
-    output wire       IABUS     // UCF N5; tied low in pipe v1
+    output wire       LIAR,
+    output wire       IABUS
 );
-
-    assign LIAR  = 1'b0;
-    assign IABUS = 1'b0;
 
     hardwired_ctrl_pipe u_ctrl (
         .CLR_n  (CLR_n),
@@ -71,6 +67,7 @@ module top (
         .W3     (W3),
         .C      (C),
         .Z      (Z),
+        .INTR   (INTR),
         .DRW    (DRW),
         .PCINC  (PCINC),
         .LPC    (LPC),
@@ -97,7 +94,9 @@ module top (
         .SEL0   (SEL0),
         .SEL1   (SEL1),
         .SEL2   (SEL2),
-        .SEL3   (SEL3)
+        .SEL3   (SEL3),
+        .LIAR   (LIAR),
+        .IABUS  (IABUS)
     );
 
 endmodule

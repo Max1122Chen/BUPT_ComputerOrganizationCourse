@@ -15,7 +15,8 @@ Purpose: **short, human-maintained** list for session handoff.
 |----|------|
 | **CTL-F01** 顺序硬布线 | **Done** |
 | **CTL-F02** 中断拓展 | **Done**（冻结于 `feat/ctl-seq-interrupt`） |
-| **PL-F01** 流水线 v1 | **In Progress** — 设计 §2+§3；**无中断**；按 IMPLEMENTATION 重做 RTL |
+| **PL-F01** 流水线 v1 | **In Progress** — 流水基础与板测已完成；待性能文档整理 |
+| **PL-F02** 流水线中断扩展 | **In Progress** — drain 后中断；目标为与流水同台演示 |
 | **SIM-F01** / **HW-F01** | **Done** |
 
 ### 里程碑
@@ -24,7 +25,7 @@ Purpose: **short, human-maintained** list for session handoff.
 [M1 仿真]  Done   — tb_ctrl PASS
 [M2 上板]  Done   — 基础 + CTL-F02（interrupt 分支）
 [M3 拓展]  Done   — CTL-F02
-[M4 进阶]  In Progress — PL-F01（Opcode_cache 模型）
+[M4 进阶]  In Progress — PL-F01（Opcode_cache 模型）+ PL-F02（流水中断）
 ```
 
 ---
@@ -33,6 +34,7 @@ Purpose: **short, human-maintained** list for session handoff.
 
 - **顺序+中断冻结：** `git checkout feat/ctl-seq-interrupt`
 - **流水开发：** `main`；设计 [PL-F01_DESIGN §3](./designs/PL-F01_DESIGN.md)；执行 [PL-F01_IMPLEMENTATION](./designs/PL-F01_IMPLEMENTATION.md)
+- **流水中断：** [PL-F02_DESIGN](./designs/PL-F02_DESIGN.md)；以 `hardwired_ctrl_pipe.v` 为实现入口
 - **顺序基线：** `rtl/controller/hardwired_ctrl.v`（勿破坏 `tb_ctrl`）
 - **仿真：** `.\sim\run_tb.ps1`
 
@@ -40,7 +42,6 @@ Purpose: **short, human-maintained** list for session handoff.
 
 ## Explicitly not backlog（本阶段）
 
-- 流水版 CTL-F02 中断（等 PL-F01 v1 板上通过后再追）
 - 旧版 `pipe_regs`/`hazard_unit` RTL
 
 ---
@@ -51,4 +52,5 @@ Purpose: **short, human-maintained** list for session handoff.
 |------|------|
 | [FEATURE_REGISTRY](./FEATURE_REGISTRY.md) | Feature 状态 |
 | [CTL-F02_DESIGN](./designs/CTL-F02_DESIGN.md) | 中断设计 |
+| [PL-F02_DESIGN](./designs/PL-F02_DESIGN.md) | 流水中断设计 |
 | [PROGRESS_LOG](./PROGRESS_LOG.md) | 时间线 |
