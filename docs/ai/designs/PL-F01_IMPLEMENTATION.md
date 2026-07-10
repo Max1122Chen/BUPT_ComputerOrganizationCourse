@@ -28,15 +28,15 @@
 
 | Slice ID | 内容 | 状态 | 验证 |
 |----------|------|------|------|
-| PL-F01-S01 | `hardwired_ctrl_core` 抽取 + `hardwired_ctrl_pipe` 骨架 | Planned | 编译 |
-| PL-F01-S02 | 状态机：`allow_ex`/`deny_ex`/`instr_cached`/`Opcode_cache` | Planned | `tb_pipe` 复位 |
-| PL-F01-S03 | EX 型拍：cache 采样 + EX 译码 + `LIR+PCINC` | Planned | `tb_pipe` c1–c2 |
-| PL-F01-S04 | MEM 型拍：MEM 译码 + bubble（MEM 排他） | Planned | `tb_pipe` LD c3 |
-| PL-F01-S05 | 短指令背靠背（ADD→INC→ADD） | Planned | `tb_pipe` c4–c5 |
-| PL-F01-S06 | 控制冒险：JC/JZ/JMP flush | Planned | `tb_pipe` 分支 |
-| PL-F01-S07 | 手动 SW bypass + `run_tb.ps1` 集成 | Planned | 全 sim PASS |
+| PL-F01-S01 | `hardwired_ctrl_core` 抽取 + `hardwired_ctrl_pipe` 骨架 | Done | 编译 |
+| PL-F01-S02 | 状态机：`allow_ex`/`deny_ex`/`instr_cached`/`Opcode_cache` | Done | `tb_pipe` 复位 |
+| PL-F01-S03 | EX 型拍：cache 采样 + EX 译码 + `LIR+PCINC` | Done | `tb_pipe` c1–c2 |
+| PL-F01-S04 | MEM 型拍：MEM 译码 + bubble（MEM 排他） | Done | `tb_pipe` LD c3 |
+| PL-F01-S05 | 短指令背靠背（ADD→INC→ADD） | Done | `tb_pipe` c4–c5 |
+| PL-F01-S06 | 控制冒险：JC/JZ/JMP flush | Done | `tb_pipe` 分支 |
+| PL-F01-S07 | 手动 SW bypass + `run_tb.ps1` 集成 | Done | 全 sim PASS |
 | PL-F01-S08 | `PL-F01_PERFORMANCE.md` + CPI 统计 | Planned | 文档 |
-| PL-F01-S09 | `top` 切换 + 上板回归 | Planned | HW |
+| PL-F01-S09 | `top` 切换 + 上板回归 | Done | HW（待烧录） |
 
 ---
 
@@ -85,6 +85,7 @@
 ### S09 — 上板
 - **Touch:** `rtl/top/top.v`（`USE_PIPELINE` 或双实例）
 - **DoD:** 烧录流水 bit；用例 A/C；与顺序行为对比记录
+- **板测程序：** [PL-F01_BOARD_TEST](./PL-F01_BOARD_TEST.md)
 
 ---
 
@@ -129,5 +130,6 @@ S01 → S02 → S03 → S04 → S05 → S06 → S07 → S08 → S09
 
 | 日期 | 说明 |
 |------|------|
+| 2026-07-10 | S01–S07 RTL+tb_pipe 完成；`run_tb.ps1` 全 PASS |
 | 2026-07-10 | 按 §3 新模型重写；废弃旧 S01–S07 Done 记录 |
 | 2026-07-08 | （作废）旧 pipe_regs 实现 |

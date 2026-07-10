@@ -126,4 +126,13 @@
 - **Validation done:** `sim/run_tb.ps1` PASS（顺序版）
 - **Next step:** 设计 DI/EI/IRET/OUT 的顺序控制字，并对标微程序/老师资料
 
+### 2026-07-10 — PL-F01 流水 RTL S01–S07（sim PASS）
+
+- **Goal:** 按 §3 `Opcode_cache` + `allow_ex` 模型实现流水控制器 v1（无中断）
+- **Main changes:**
+  - 新建 `hardwired_ctrl_core.v`、`hardwired_ctrl_pipe.v`；`sim/tb_pipe.v`；`run_tb.ps1` 扩展
+  - 顺序基线 `hardwired_ctrl.v` 中断逻辑对齐 partner/tb（`IWAIT` 优先、`int_ack` 含 `~IWAIT`）
+- **Validation done:** `sim/run_tb.ps1` — `tb_ctrl` + `tb_manual_sto` + `tb_pipe` PASS
+- **Next step:** S08 性能文档；ISE 重综合烧录流水 bit
+
 <!-- 新条目请用 templates/progress-log-entry.template.md 格式追加在上方 -->

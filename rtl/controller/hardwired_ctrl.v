@@ -1,5 +1,5 @@
-// TEC-PLUS hardwired controller ÔøΩsequential baseline + interrupt (CTL-F02)
-// STO: SSTO set in combo logic, latched on negedge T3 (after AR LAR load at T3ÔøΩ
+// TEC-PLUS hardwired controller ùsequential baseline + interrupt (CTL-F02)
+// STO: SSTO set in combo logic, latched on negedge T3 (after AR LAR load at T3ù
 // INTR = PAUSE button; LIAR/IABUS for IAR save/restore (fly wires N4/N5).
 
 `timescale 1ns / 1ps
@@ -61,8 +61,6 @@ module hardwired_ctrl (
     reg        EINT;
     reg        INTQ;
     reg        IWAIT;
-    reg        int_ack_consumed;
-    reg        int_load_consumed;
 
     localparam RUN    = 3'b000;
     localparam WR_REG = 3'b100;
@@ -75,7 +73,7 @@ module hardwired_ctrl (
     localparam JMP = 4'b1001, OUT = 4'b1010, IRET = 4'b1011, DI = 4'b1100;
     localparam EI  = 4'b1101, STP = 4'b1110;
 
-    wire int_ack  = (mode == RUN) & W1 & INTQ & EINT;
+    wire int_ack  = (mode == RUN) & W1 & INTQ & EINT & ~IWAIT;
     wire int_load = (mode == RUN) & W1 & IWAIT;
     wire set_ei   = (mode == RUN) & W2 & (op == EI);
     wire set_di   = (mode == RUN) & W2 & (op == DI);
@@ -96,24 +94,20 @@ module hardwired_ctrl (
             EINT  <= 1'b0;
             INTQ  <= 1'b0;
             IWAIT <= 1'b0;
-            int_ack_consumed <= 1'b0;
-            int_load_consumed <= 1'b0;
         end else begin
-				if (set_ei)
+            if (int_ack)
+                EINT <= 1'b0;
+            else if (set_ei)
                 EINT <= 1'b1;
             else if (set_di)
                 EINT <= 1'b0;
 
-            if (int_ack & !int_ack_consumed)
-                int_ack_consumed <= 1'b1;
-            else if(int_ack & int_ack_consumed) begin
+            if (int_ack)
                 INTQ <= 1'b0;
-                int_ack_consumed <= 1'b0;
-            end
-            else    // int_ack == 0
-                INTQ <= (INTR & EINT);
+            else if (INTR & EINT)
+                INTQ <= 1'b1;
 
-            if (int_ack_consumed)
+            if (int_ack)
                 IWAIT <= 1'b1;
             else if (int_load)
                 IWAIT <= 1'b0;
@@ -155,13 +149,13 @@ module hardwired_ctrl (
         case (mode)
         RUN: begin
             if (W1) begin
-                if (INTQ) begin
-                    LIAR  = 1'b1;
-                    STOP  = 1'b1;
-                    SHORT = 1'b1;
-                end else if (IWAIT) begin
+                if (IWAIT) begin
                     SBUS  = 1'b1;
                     LPC   = 1'b1;
+                    SHORT = 1'b1;
+                end else if (INTQ & EINT) begin
+                    LIAR  = 1'b1;
+                    STOP  = 1'b1;
                     SHORT = 1'b1;
                 end else begin
                     LIR   = 1'b1;

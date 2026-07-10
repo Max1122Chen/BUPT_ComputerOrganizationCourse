@@ -18,4 +18,13 @@ iverilog -o (Join-Path $Work "tb_manual_sto.out") `
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 vvp (Join-Path $Work "tb_manual_sto.out")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+iverilog -o (Join-Path $Work "tb_pipe.out") `
+    (Join-Path $Root "rtl\controller\hardwired_ctrl_core.v") `
+    (Join-Path $Root "rtl\controller\hardwired_ctrl_pipe.v") `
+    (Join-Path $Root "sim\tb_pipe.v")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+vvp (Join-Path $Work "tb_pipe.out")
 exit $LASTEXITCODE

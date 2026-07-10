@@ -3,7 +3,9 @@
 Last updated: 2026-07-10  
 Purpose: **short, human-maintained** list for session handoff.
 
-> **下一会话首句（建议）：** 按 PL-F01 §3 实现 S01–S03（core 抽取 + allow_ex 状态机 + EX 型拍）。
+### 下一会话首句（建议）
+
+按 PL-F01 S08–S09（性能文档 + `top` 流水切换上板）。
 
 ---
 
