@@ -1,6 +1,6 @@
 # Feature Registry
 
-Last updated: 2026-07-09  
+Last updated: 2026-07-10  
 Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 
 ---
@@ -14,7 +14,7 @@ Purpose: **single source of truth** for `<DOMAIN>-F<nn>` IDs.
 | `CTL-F02` | 顺序中断扩展（OUT/DI/EI/IRET + INTR） | **Done** | — | [DESIGN](./designs/CTL-F02_DESIGN.md) · 板测通过 |
 | `SIM-F01` | 仿真 Testbench 与控制字回归 | **Done** | — | `tb_ctrl` PASS |
 | `HW-F01` | UCF、ISE 综合、上板（基础） | **Done** | — | [HW-F01_BOARD_TEST](./designs/HW-F01_BOARD_TEST.md) |
-| `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **Deferred** | — | [DESIGN](./designs/PL-F01_DESIGN.md)（已回滚实现） |
+| `PL-F01` | 流水线 + 冒险 + 性能（进阶） | **In Progress** | — | [DESIGN](./designs/PL-F01_DESIGN.md) §3 + [IMPLEMENTATION](./designs/PL-F01_IMPLEMENTATION.md) |
 
 **总纲：** [REQUIREMENTS_ANALYSIS](./designs/REQUIREMENTS_ANALYSIS.md)（Approved）· [EXECUTION_ROADMAP](./designs/EXECUTION_ROADMAP.md)
 

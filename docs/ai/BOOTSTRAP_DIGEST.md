@@ -8,9 +8,9 @@ Purpose: **one-page** context for humans and AI when starting or recovering a se
 
 ## Project in one line
 
-**BUPT 计组课设** — 题目 A 硬布线控制器；**基础+CTL-F02 中断 Done**。
+**BUPT 计组课设** — 基础+CTL-F02 Done；**当前 PL-F01 流水线 v1**（`Opcode_cache` 模型，无中断）。
 
-**Deferred：** PL-F01 流水线。
+**冻结分支：** `feat/ctl-seq-interrupt`（顺序+中断）。
 
 ---
 

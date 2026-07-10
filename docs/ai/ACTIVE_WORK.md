@@ -1,9 +1,9 @@
 # Active work (agent backlog)
 
-Last updated: 2026-07-09  
+Last updated: 2026-07-10  
 Purpose: **short, human-maintained** list for session handoff.
 
-> **下一会话首句（建议）：** CTL-F02 仿真 PASS；请按 HW-F01 §11 上板测中断（EI→PAUSE→装入口→ISR→IRET）。
+> **下一会话首句（建议）：** 按 PL-F01 §3 实现 S01–S03（core 抽取 + allow_ex 状态机 + EX 型拍）。
 
 ---
 
@@ -12,45 +12,34 @@ Purpose: **short, human-maintained** list for session handoff.
 | 项 | 状态 |
 |----|------|
 | **CTL-F01** 顺序硬布线 | **Done** |
-| **CTL-F02** 中断拓展 | **Done** — RTL+UCF+sim+板测 |
-| **SIM-F01** 仿真 | **Done**（`tb_ctrl` + `tb_manual_sto` PASS） |
-| **HW-F01** 上板 | **Done**（基础）；拓展飞线见 §3.1 |
-| **PL-F01** 流水线 | **Deferred** |
+| **CTL-F02** 中断拓展 | **Done**（冻结于 `feat/ctl-seq-interrupt`） |
+| **PL-F01** 流水线 v1 | **In Progress** — 设计 §2+§3；**无中断**；按 IMPLEMENTATION 重做 RTL |
+| **SIM-F01** / **HW-F01** | **Done** |
 
 ### 里程碑
 
 ```text
-[M1 仿真]  Done   — iverilog + tb_ctrl PASS
-[M2 上板]  Done   — 基础层次 PASS
-[M3 拓展]  Done   — CTL-F02 中断
-[M4 进阶]  Deferred — PL-F01
+[M1 仿真]  Done   — tb_ctrl PASS
+[M2 上板]  Done   — 基础 + CTL-F02（interrupt 分支）
+[M3 拓展]  Done   — CTL-F02
+[M4 进阶]  In Progress — PL-F01（Opcode_cache 模型）
 ```
 
 ---
 
 ## 交接要点
 
-- **RTL：** `rtl/controller/hardwired_ctrl.v`（含 INTR/LIAR/IABUS）
-- **约束：** `constraints/tecplus.ucf` — W3=F4；INTR=G6；LIAR=N4；IABUS=N5
-- **飞线：** T3→C10；LIAR→N4；IABUS→N5；PAUSE=INTR（板内 G6）
-- **仿真：** `.\sim\run_tb.ps1` PASS
-- **上板：** [HW-F01_BOARD_TEST §11](./designs/HW-F01_BOARD_TEST.md) 用例 D
+- **顺序+中断冻结：** `git checkout feat/ctl-seq-interrupt`
+- **流水开发：** `main`；设计 [PL-F01_DESIGN §3](./designs/PL-F01_DESIGN.md)；执行 [PL-F01_IMPLEMENTATION](./designs/PL-F01_IMPLEMENTATION.md)
+- **顺序基线：** `rtl/controller/hardwired_ctrl.v`（勿破坏 `tb_ctrl`）
+- **仿真：** `.\sim\run_tb.ps1`
 
 ---
 
-## Verification habit
+## Explicitly not backlog（本阶段）
 
-| Check | Command | 当前 |
-|-------|---------|------|
-| Sanity | `.\scripts\verify.ps1 -Stage 0` | PASS |
-| Sim | `.\sim\run_tb.ps1` | PASS |
-| Board | 用例 D（中断） | **Done** |
-
----
-
-## Explicitly not backlog
-
-- PL-F01 流水线（Deferred）
+- 流水版 CTL-F02 中断（等 PL-F01 v1 板上通过后再追）
+- 旧版 `pipe_regs`/`hazard_unit` RTL
 
 ---
 
